@@ -81,12 +81,7 @@ class MathsImpl implements Maths {
 		
 		return MathsImpl.instance;
 	}
-	getInstance(isUseChain?: boolean): Maths {
-		if(MathsImpl.instance){
-			return MathsImpl.instance;
-		}
-		return MathsImpl.newInstance(typeof isUseChain === "boolean" ? isUseChain : this.useChain)
-	}
+	
 	
 	// Finished computed
 	done(): number {
@@ -103,18 +98,18 @@ class MathsImpl implements Maths {
 	
 	// 链式调用
 	chain(key: string | number, ...args: Nums): Maths {
+        const that : Maths | any =  MathsImpl.instance || this;
 		if(typeof key === "number"){						
 			this.result = key || 0;
 			this.isInit = true;
-			return this.getInstance();
+			return that;
 		}
-        const that: any = this;
 		if(this.useChain){
 			const firstArg: number = this.isInit ? this.result : args.splice(0, 1)[0];
             const opts = [firstArg, ...args];
 			this.result = that[key + "s"](...opts);
 			this.isInit = true;
-			return this.getInstance();
+			return that;
 		}
 		return that[key + "s"](...args);
 	}
@@ -243,5 +238,8 @@ class MathsImpl implements Maths {
 		return result;
 	}
 }
-
+// 单例模式
 export const math = MathsImpl.newInstance;
+
+// 多例模式
+export const maths = MathsImpl;
