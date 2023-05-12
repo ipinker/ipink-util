@@ -39,6 +39,7 @@
         "vue-tsc": "^1.0.24"
     },
     "files": [
-        "dist"
+        "dist",
+        "*.d.ts"
     ]
 }

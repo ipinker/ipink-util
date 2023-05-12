@@ -2,7 +2,7 @@
  * @Author: 牛洪法
  * @Date: 2023-05-12 09:44:21
  * @LastEditors: 牛洪法 1242849166@qq.com
- * @LastEditTime: 2023-05-12 13:58:21
+ * @LastEditTime: 2023-05-12 14:17:10
  * @FilePath: /Lib/src/pink-js/rollup.config.js
  * @Description: rollup.config
  */
@@ -14,11 +14,11 @@ import dts from 'rollup-plugin-dts'
 import pkg from './package.json';
 
 const banner =
-  '/*!\n' +
-  ` * ipink-js.js v${pkg.version}\n` +
-  ` * (c) 2023-${new Date().getFullYear()} ataola(ipink.pink | ilive.live)\n` +
-  ' * Released under the MIT License.\n' +
-  ' */';
+    '/*!\n' +
+    ` * ipink-js.js v${pkg.version}\n` +
+    ` * (c) 2023-${new Date().getFullYear()} ataola(ipink.pink | ilive.live)\n` +
+    ' * Released under the MIT License.\n' +
+    ' */';
 
 const entries = [
     'src/index.ts',
@@ -32,65 +32,49 @@ export default [
     ...entries.map(input => ({
         input,
         output: [
-          {
-            file: input.replace('src/', 'dist/').replace('.ts', '.js'),
-            format: 'es',
-          },
-          {
-            file: input.replace('src/', 'dist/').replace('.ts', '.cjs'),
-            format: 'cjs',
-          },
+            {
+                file: pkg.main,
+                format: 'cjs',
+                sourcemap: true
+            },
+            {
+                file: pkg.module,
+                format: 'esm',
+                sourcemap: true
+            },
+            {
+                name: "ipink-lib",
+                file: pkg.unpkg,
+                format: 'iife',
+                extend: true,
+                sourcemap: true,
+                banner,
+            },
+            {
+                name: 'ipink-lib',
+                file: 'dist/index.min.js',
+                format: 'iife',
+                extend: true,
+                banner,
+                sourcemap: true,
+                plugins: [terser()],
+            }
         ],
         external: [],
         plugins,
-      })),
-      ...entries.map(input => ({
+    })),
+    ...entries.map(input => ({
         input,
         output: {
-          file: input.replace('src/', '').replace('.ts', '.d.ts'),
-          format: 'esm',
+            file: input.replace('src/', '').replace('.ts', '.d.ts'),
+            format: 'esm',
         },
         external: [],
         plugins: [
-          dts({ respectExternal: true }),
+            dts.default({ respectExternal: true }),
         ],
-      })),
+    })),
 ];
-// const a = {
-//     input: "./src/index.ts",
-//     plugins: [
-//         typescript(), json(), commonjs()
-//     ],
-//     output: [
-//         {
-//             file: pkg.main,
-//             format: 'cjs',
-//             sourcemap: true
-//         },
-//         {
-//             file: pkg.module,
-//             format: 'esm',
-//             sourcemap: true
-//         },
-//         {
-//             name: "ipink-lib",
-//             file: pkg.unpkg,
-//             format: 'iife',
-//             extend: true,
-//             sourcemap: true,
-//             banner,
-//         },
-//         {
-//             name: 'ipink-lib',
-//             file: 'dist/index.min.js',
-//             format: 'iife',
-//             extend: true,
-//             banner,
-//             sourcemap: true,
-//             plugins: [terser()],
-//         },
-//     ]
-// }
 /*
 
 import json from '@rollup/plugin-json';
@@ -185,4 +169,4 @@ import pkg from './package.json';
     },
   ];
 
-*/ 
+*/

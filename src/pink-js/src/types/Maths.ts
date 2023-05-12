@@ -2,8 +2,8 @@
  * @Author: 牛洪法
  * @Date: 2023-05-12 10:17:31
  * @LastEditors: 牛洪法 1242849166@qq.com
- * @LastEditTime: 2023-05-12 11:47:15
- * @FilePath: /Lib/src/pink-js/src/interface/Maths.ts
+ * @LastEditTime: 2023-05-12 14:13:37
+ * @FilePath: /Lib/src/pink-js/src/types/Maths.ts
  * @Description: 描述
  */
 import { Nums, Num } from "./Common";
@@ -11,7 +11,7 @@ import { Nums, Num } from "./Common";
 type Nums2Num = (...args: Nums) => number;
 type Nums2Maths = (...args: Nums) => Maths;
 
-export interface Maths {
+export default interface Maths {
 
     useChain: boolean;
     isInit: boolean;

@@ -3,7 +3,7 @@
         "src/"
     ],
     "compilerOptions": {
-        "target": "esnext",
+        "target": "es2018",
         "module": "esnext",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
@@ -16,9 +16,6 @@
         "lib": [
             "esnext",
             "dom"
-        ],
-        "paths": {
-            "@/*": ["./src/*"]
-        }
+        ]
     }
 }

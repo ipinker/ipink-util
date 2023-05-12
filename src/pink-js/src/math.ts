@@ -51,7 +51,7 @@
   **/ 
 
 import { Num, Nums } from "./types/Common";
-import { Maths } from "./types/Maths"
+import Maths from "./types/Maths"
 
 
 class MathsImpl implements Maths {
@@ -244,4 +244,4 @@ class MathsImpl implements Maths {
 	}
 }
 
-export default MathsImpl.newInstance;
+export const math = MathsImpl.newInstance;
