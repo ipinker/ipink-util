@@ -1,3 +1,7 @@
 node_modules
-
-.DS_Store
+dist
+unpackage
+pnpm-lock.yaml
+yarn.lock
+yarn-error.lock
+package-lock.json

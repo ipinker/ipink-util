@@ -1,9 +1,9 @@
 <!--
  * @Author: error: git config user.name & please set dead value or install git
  * @Date: 2023-03-20 15:48:19
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-05-11 22:48:43
- * @FilePath: /ipink-lib/src/pages/index/index.vue
+ * @LastEditors: 牛洪法 1242849166@qq.com
+ * @LastEditTime: 2023-05-12 14:53:30
+ * @FilePath: /Lib/src/pages/index/index.vue
  * @Description: 描述
 -->
 <template>
@@ -16,6 +16,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { math } from "../../pink-js";
+console.log(math)
 const title = ref('Hello')
 </script>
 

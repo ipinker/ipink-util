@@ -1,16 +1,12 @@
 {
-    "include": [
-        "src/"
-    ],
     "compilerOptions": {
         "target": "es2018",
         "module": "esnext",
         "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
         "strict": true,
+        "strictNullChecks": true,
         "skipLibCheck": true,
-        "declaration": true,
-        "declarationDir": "./dist",
+        "forceConsistentCasingInFileNames": true,
         "types": ["vite/client"],
         "jsx": "preserve",
         "lib": [

@@ -98,4 +98,6 @@ declare class MathsImpl implements Maths {
 }
 declare const math: typeof MathsImpl.newInstance;
 
-export { math };
+declare const bool: (a: boolean, b: boolean) => boolean;
+
+export { bool, math };

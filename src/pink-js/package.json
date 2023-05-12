@@ -1,12 +1,12 @@
 {
     "name": "ipink-js",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "",
     "type": "module",
-    "main": "dist/index.cjs.js",
-    "module": "dist/index.esm.js",
+    "main": "dist/index.cjs",
+    "module": "dist/index.mjs",
     "unpkg": "dist/index.js",
-    "types": "dist/types/index.d.ts",
+    "types": "index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "rollup -c rollup.config.js --bundleConfigAsCjs --watch"
