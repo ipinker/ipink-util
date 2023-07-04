@@ -11,6 +11,12 @@
         "plugin:prettier/recommended"
     ],
     "overrides": [
+        {
+          "rules": {
+              // 禁止不必要的转义字符
+              "no-useless-escape": 0
+          }
+        }
     ], 
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
