@@ -6,6 +6,17 @@
  * @FilePath: /Lib/src/pink-js/src/interface/Common.ts
  * @Description: 公共接口
  */
+;
 
-export type Num = string | number; 
+
+declare const window: any;
+export { window };
+export type Num = string | number;
 export type Nums = Array<number>;
+
+export interface Fail {
+    err: { errMsg?: string } | string | null,
+    errMsg?: string | null
+}
+
+

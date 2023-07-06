@@ -41,5 +41,9 @@
     "files": [
         "dist",
         "*.d.ts"
-    ]
+    ],
+    "dependencies": {
+        "@dcloudio/types": "^3.3.3",
+        "miniprogram-api-typings": "^3.10.0"
+    }
 }

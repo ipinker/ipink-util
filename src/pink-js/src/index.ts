@@ -7,5 +7,8 @@
  * @Description: 描述
  */
 
+export * from './util';
 export * from './math';
 export * from './equals';
+export * from './is';
+export * from './image';

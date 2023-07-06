@@ -6,8 +6,9 @@
         "strict": true,
         "strictNullChecks": true,
         "skipLibCheck": true,
+        "moduleResolution": "node",
         "forceConsistentCasingInFileNames": true,
-        "types": ["vite/client"],
+        "types": ["vite/client", "@dcloudio/types", "miniprogram-api-typings"],
         "jsx": "preserve",
         "lib": [
             "esnext",
