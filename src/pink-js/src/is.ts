@@ -219,35 +219,41 @@ export const isYesterday = (date: Date): boolean => {
 /* 逻辑空值处理 */
 
 // 是否为空值
-export const isEmpty = (obj: unknown, trim = false): boolean => {
+export const isEmpty = (obj: any, trim = false): boolean => {
 	let empty = false;
 	if(
-		obj === null || obj === "null" ||
-		obj === void 0 || obj === "undefined" ||
-		(typeof obj === "string" && obj === "") ||
-		(typeof obj === "string" && (trim && obj.trim() === ""))
+		isNull(obj, true) ||
+		isUndefined(obj, true) ||
+		(isString(obj) && obj === "") ||
+		(isString(obj) && trim && obj.trim() === "")
 	) empty = true;
 	else empty = false;
 	return empty;
 }
 
 // 是否为空对象
-export const isEmptyObject = (obj: unknown, trim = false): boolean => {
+export const isEmptyObject = (obj: any, trim = false, deep = false): boolean => {
 	let empty = false;
 	// 假值
 	if (isEmpty(obj, trim)) empty = true;
 	// 数组且没长度
-	else if (Array.isArray(obj) && !obj.length) empty = true;
+	else if (isArray(obj) && !obj.length) empty = true;
 	// 数组长度不为 0, 但内容全是假值
-	else if (Array.isArray(obj) && obj.length && !(obj.filter(item => !isEmpty(item, trim)).length)) empty = true;
+	else if (isArray(obj) && obj.length && !(obj.filter((item: any) => !isEmpty(item, trim)).length)) empty = true;
 	// 对象且, 属性全部假值
-	else if (
-		isObject(obj) &&
-		!(Object.values(obj as object).filter(item => !isEmpty(item, trim)).length)
-	) empty = true;
+	else if (isObject(obj)) {
+		const result = Object.values(obj).filter(item => {
+			if(isObject(item) && deep){
+				if(!isEmptyObject(item, trim, deep)) return item;
+			}
+			else if (!isEmpty(item, trim)) return item;
+		});
+		empty = !result.length;
+	}
 	else empty = false;
 	return empty;
 };
+
 
 /* -------------------------------------------------------------------------- */
 /* 字符串处理 */
