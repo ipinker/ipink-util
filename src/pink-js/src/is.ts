@@ -242,9 +242,12 @@ export const isEmptyObject = (obj: any, trim = false, deep = false): boolean => 
 	else if (isArray(obj) && obj.length && !(obj.filter((item: any) => !isEmpty(item, trim)).length)) empty = true;
 	// 对象且, 属性全部假值
 	else if (isObject(obj)) {
-		const result = Object.values(obj).filter(item => {
+		const result: any[] = Object.values(obj).filter((item: any) => {
 			if(isObject(item) && deep){
 				if(!isEmptyObject(item, trim, deep)) return item;
+			}
+			else if (isArray(item) && deep) {
+				if (item.length) return item;
 			}
 			else if (!isEmpty(item, trim)) return item;
 		});
