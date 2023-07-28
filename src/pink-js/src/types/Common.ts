@@ -9,8 +9,6 @@
 ;
 
 
-declare const window: any;
-export { window };
 export type Num = string | number;
 export type Nums = Array<number>;
 

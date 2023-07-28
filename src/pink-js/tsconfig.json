@@ -8,7 +8,7 @@
         "skipLibCheck": true,
         "moduleResolution": "node",
         "forceConsistentCasingInFileNames": true,
-        "types": ["vite/client", "@dcloudio/types", "miniprogram-api-typings"],
+        "types": ["vite/client", "@dcloudio/types", "miniprogram-api-typings", "mini-types/types",],
         "jsx": "preserve",
         "lib": [
             "esnext",

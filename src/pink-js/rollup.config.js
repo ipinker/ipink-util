@@ -33,9 +33,12 @@ export default [
         input,
         output: [
             {
-                file: pkg.main,
+                // file: pkg.main,
                 format: 'cjs',
-                sourcemap: true
+                sourcemap: true,
+                preserveModules: true,
+                exports: "named",
+                dir: "lib"
             },
             {
                 file: pkg.module,
@@ -48,7 +51,7 @@ export default [
                 format: 'iife',
                 extend: true,
                 sourcemap: true,
-                banner,
+                banner
             },
             {
                 name: 'ipink-lib',

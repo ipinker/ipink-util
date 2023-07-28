@@ -5,7 +5,7 @@
  */
 
 import {isMaxVersion} from "./is";
-import {Fail, window} from "./types/Common";
+import {Fail} from "./types/Common";
 import {FileInfo} from "./types/File";
 import {CanvasContext, CanvasElement, UniElement} from "./types/Element";
 
