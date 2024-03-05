@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": "./src",
         "target": "esnext",
         "module": "esnext",
         "strict": true,
@@ -12,25 +13,24 @@
         "allowSyntheticDefaultImports": true,
         "useDefineForClassFields": true,
         "resolveJsonModule": true,
+        "isolatedModules": true,
         "lib": [
             "esnext",
             "dom"
         ],
         "types": [
-            "@dcloudio/types"
+            "vite/client",
         ]
     },
     "include": [
-        "src/**/*.ts",
-        "src/**/*.d.ts",
-        "src/**/*.tsx",
-        "src/**/*.vue"
+        "**.d.ts",
+        "./**.ts",
+        "./**/*.ts",
+        "./**/*.d.ts",
+        "./**/*.tsx"
     ],
     "exclude": [
         "node_modules",
-        "unpackage",
-        "dist",
-        "src/pink-js/**",
-        "src/pink-ui/**"
+        "dist"
     ]
 }

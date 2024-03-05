@@ -6,3 +6,5 @@ yarn.lock
 yarn-error.lock
 package-lock.json
 .idea
+*.js
+*.js.map

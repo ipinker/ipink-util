@@ -1,0 +1,49 @@
+{
+	"name": "ipink-util",
+	"version": "0.0.1",
+	"description": "util.js",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		},
+		"./es": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./lib": {
+			"types": "./dist/index.d.ts",
+			"require": "./dist/index.js"
+		},
+		"./*": "./*"
+	},
+    "keywords": [
+        "javascript",
+        "uniapp",
+        "util",
+        "utiljs",
+        "ipink"
+    ],
+	"files": [
+		"dist",
+		"package.json",
+		"README.md",
+        "LICENSE"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ipinker/ipink-util.git"
+	},
+	"scripts": {
+		"build": "tsc && vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@ctrl/tinycolor": "^4.0.2"
+	},
+    "license": "ISC"
+}

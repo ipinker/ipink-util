@@ -1,5 +1,0 @@
-# ipink-ui
-
-#### Description
-
-
