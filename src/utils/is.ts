@@ -4,6 +4,7 @@
  * @Create: 24/01/24 16:47:07
  */
 
+import { TinyColor } from "@ctrl/tinycolor";
 import {parseDate} from "./date";
 
 /**** 数据类型判断 ****/
@@ -343,3 +344,15 @@ export const isPhoneSize = (): boolean => {
 export const isOnline = () => !navigator || navigator.onLine === true;
 // 是否离线
 export const isOffline = !isOnline();
+
+/**
+ * @desc 判断颜色是否为亮色 ｜ 还是暗色
+ * @param param { type }
+ * @return: 
+ */
+export const isDarkColor = (color: string) => {
+	const colorInfo = new TinyColor(color);
+	const { r, g, b, isValid } = colorInfo || {};
+	if(!isValid) return false;
+	return (r * 0.299 + g * 0.587 + b * 0.114) > 186;
+}
