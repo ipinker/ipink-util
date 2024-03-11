@@ -20,6 +20,9 @@
         ],
         "types": [
             "vite/client",
+            "@dcloudio/types",
+            "mini-types/types",
+            "miniprogram-api-typings"
         ]
     },
     "include": [
