@@ -51,7 +51,8 @@ export interface CalendarInfo {
     isLeap: boolean
     /** @desc 是否节气 **/
     isTerm: boolean
-
+    /** @desc 是否是节日 **/
+    isFestival?: boolean;
     /** @desc 周几 **/
     week: number
     /** @desc 周几 汉字 **/
@@ -63,10 +64,13 @@ export interface CalendarInfo {
     astro: string
 }
 
-let lunarMonth = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'],
-	lunarDay = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '初', '廿'],
-	diZhi = ['子鼠', '丑牛', '寅虎', '卯兔', '辰龙', '巳蛇', '午马', '未羊', '申猴', '酉鸡', '戌狗', '亥猪'];
+let lunarMonth = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊' ] as const,
+	lunarDay = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '初', '廿'] as const,
+	diZhi = ['子鼠', '丑牛', '寅虎', '卯兔', '辰龙', '巳蛇', '午马', '未羊', '申猴', '酉鸡', '戌狗', '亥猪'] as const;
 
+export type LunarMonthType = (typeof lunarMonth)[number];
+export type LunarDayType = (typeof lunarDay)[number];
+export type DiZhiType = (typeof diZhi)[number];
 
 // 公历转农历函数
 export const sloarToLunar = function(sy: number, sm: number, sd: number): LunarInfo {
@@ -287,7 +291,7 @@ function getDiZhi(ly: number): string {
  * @desc 获取时间
  * @param { Date } date new Date()
  */
-export const getYearMonthDayNew = (date: Date): DateInfo => {
+export const getYearMonthDayNew = (date?: Date): DateInfo => {
 	date = date || new Date();
 	let year = date.getFullYear();
 	let month = date.getMonth() + 1;
@@ -322,7 +326,9 @@ export const defaultLunar = {
 	'10-15': '下元节',
 	'12-8': '腊八节',
 	'12-23': '小年',
-};
+} as const;
+
+export type LunarKeyType = keyof ( typeof defaultLunar );
 
 export const defaultGregorian = {
 	'1-1': '元旦',
@@ -338,8 +344,9 @@ export const defaultGregorian = {
 	'10-1': '国庆节',
 	'12-24': '平安夜',
 	'12-25': '圣诞节',
-};
+} as const;
 
+export type GregorianKeyType = keyof ( typeof defaultGregorian );
 
 /**
  * @desc @1900-2100区间内的公历、农历互转

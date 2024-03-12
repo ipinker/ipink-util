@@ -1,4 +1,5 @@
 export * from "./utils/is";
+export * from "./utils/get";
 export * from "./utils/date";
 export * from "./utils/util";
 export * from "./utils/calendar";
@@ -6,3 +7,5 @@ export * from "./utils/debts";
 export * from "./utils/pinyin";
 export * from "./utils/cache";
 export * from "./utils/image";
+import _Calendar from "./utils/calendar";
+export const Calendar = _Calendar;

@@ -101,9 +101,14 @@ export function base64decode (str: string): string {
     }
     return out;
 }
-export interface ToastOptionType {
 
-}
+/**
+ * @desc Uni.showToast 快捷调用
+ * @param title { string | UniApp.ShowToastOptions } 
+ * @param icon { "none" | "success" | "loading" | "error" | "fail" | "exception" } default "none"
+ * @param mask { boolean } default false
+ * @return: 
+ */
 export function toast (
     title: string | UniApp.ShowToastOptions, 
     icon?: "none" | "success" | "loading" | "error" | "fail" | "exception", 
@@ -122,7 +127,9 @@ export function toast (
         uni.showToast(options)
     }
     else {
-        uni.showToast(title as UniApp.ShowToastOptions);
+        const options = title as UniApp.ShowToastOptions;
+        options.icon = options.icon || "none";
+        uni.showToast(options);
     }
 }
 
