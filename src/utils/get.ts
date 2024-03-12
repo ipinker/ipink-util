@@ -11,12 +11,13 @@ export interface KeyValue<T> {
 export const getPageUrl = (): { currentPageLong?: string, currentPage?: string } => {
 	// 仅出现在 H5 平台下的代码
 	// #ifdef H5
-	return {
-		currentPageLong: window.location.href,
-		currentPage: window.location.href
-	};
+    if(window?.location){
+    	return {
+            currentPageLong: window.location.href,
+            currentPage: window.location.href
+        };
+    }
 	// #endif
-
 	// 除了 H5 平台，其它平台均存在的代码
 	// #ifndef H5
     if(!getCurrentPages) return {};

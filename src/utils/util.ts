@@ -134,7 +134,10 @@ export function toast (
 export function navigateBack(delta?: number) {
     delta = delta || 1;
     //#ifdef H5
-	window?.history && window.history.go(Number('-' + delta));
+    if(window?.history){
+        window.history.go(Number('-' + delta));
+        return 
+    }
 	//#endif
 	//#ifndef H5
 	uni?.navigateBack && uni.navigateBack({ delta: delta });

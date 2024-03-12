@@ -333,62 +333,67 @@ export async function pathToBase64 (
 			return
 		}
 		if (typeof wx === 'object' && wx.canIUse('getFileSystemManager')) {
-			// #ifdef MP-WEIXIN
-			wx.getFileSystemManager().readFile({
-				filePath: path,
-				encoding: 'base64',
-				success: function(res: WechatMiniprogram.ReadFileSuccessCallbackResult) {
-					resolve({
-						base64: 'data:image/png;base64,' + res.data,
-						file: path,
-						info: res
-					});
-				},
-				fail: function(error: ErrorType) {
-					resolve({
-						base64: "",
-						file: path,
-						err: error
-					});
-				}
-			})
-			// #endif
+            if(wx?.getFileSystemManager){
+                // #ifdef MP-WEIXIN
+                wx.getFileSystemManager().readFile({
+                    filePath: path,
+                    encoding: 'base64',
+                    success: function(res: WechatMiniprogram.ReadFileSuccessCallbackResult) {
+                        resolve({
+                            base64: 'data:image/png;base64,' + res.data,
+                            file: path,
+                            info: res
+                        });
+                    },
+                    fail: function(error: ErrorType) {
+                        resolve({
+                            base64: "",
+                            file: path,
+                            err: error
+                        });
+                    }
+                })
+                // #endif
+                return;
+            }
+            // @ts-ignore
+            if(my && my.createCanvasContext){
+                // #ifdef MP-ALIPAY
+                // 支付宝小程序端兼容, 需要在页面根组件内添加 以下代码   (750rpx) 这里仅提供一个方法, 
+                // <view style="position: fixed; top: 0; right: 0; height: 380px; background-color: pink;  left: 0; z-index: -1;"><canvas :style="{width: info.width, height: info.height}" id="canvas"></canvas></view>
+                const ctx: any = my.createCanvasContext('canvas');
+                if (info && info.width) {
+                    let rect = info.width > info.height;
+                    let ratio = my.getSystemInfoSync().windowWidth / info.width;
+                    let _height = ratio * info.height;
+                    ctx.drawImage(
+                        path,
+                        0,
+                        0,
+                        info.width,
+                        info.height
+                    );
 
-			// #ifdef MP-ALIPAY
-			// 支付宝小程序端兼容, 需要在页面根组件内添加 以下代码   (750rpx) 这里仅提供一个方法, 
-			// <view style="position: fixed; top: 0; right: 0; height: 380px; background-color: pink;  left: 0; z-index: -1;"><canvas :style="{width: info.width, height: info.height}" id="canvas"></canvas></view>
-			const ctx: any = my.createCanvasContext('canvas');
-			if (info && info.width) {
-				let rect = info.width > info.height;
-				let ratio = my.getSystemInfoSync().windowWidth / info.width;
-				let _height = ratio * info.height;
-				ctx.drawImage(
-					path,
-					0,
-					0,
-					info.width,
-					info.height
-                );
+                } else {
+                    ctx.drawImage(path, 0, 0, width || my.getSystemInfoSync().windowWidth, height);
+                }
+                ctx.draw(false, () => {
+                    ctx.toDataURL({}).then((dataURL: string) => {
+                        resolve({
+                            base64: dataURL,
+                            file: path
+                        });
+                    }).catch((err : ErrorType) => {
+                        resolve({
+                            base64: "",
+                            file: path,
+                            err
+                        });
+                    })
+                })
+                // #endif
 
-			} else {
-				ctx.drawImage(path, 0, 0, width || my.getSystemInfoSync().windowWidth, height);
-			}
-			ctx.draw(false, () => {
-				ctx.toDataURL({}).then((dataURL: string) => {
-					resolve({
-						base64: dataURL,
-						file: path
-					});
-				}).catch((err : ErrorType) => {
-					resolve({
-						base64: "",
-						file: path,
-						err
-					});
-				})
-			})
-			// #endif
-
+            }
 			return
 		}
 		resolve({
@@ -546,32 +551,35 @@ export function chooseOtherFile(options?: ChooseFileOptions) {
 				resolve([])
 			}
 		}
-		// #ifdef MP-WEIXIN || MP-QQ
-		wx.chooseMessageFile({
-			... params,
-			success (res: WechatMiniprogram.ChooseMessageFileSuccessCallbackResult) {
-				resolve(
-                    // @ts-ignore
-                    res?.tempFilePaths || 
-                    (res?.tempFiles && res.tempFiles[0] ? [res?.tempFiles[0]?.path] : [])
-                )
-			}
-		})
-		// #endif
-		// #ifdef H5
-		uni.chooseFile({
-			... params,
-			success: function (res) {
-				resolve(res.tempFilePaths || [])
-			}
-		});
-		// #endif
-		// #ifdef MP-MP-ALIPAY
+        if(wx?.chooseMessageFile){
+            // #ifdef MP-WEIXIN || MP-QQ
+            wx.chooseMessageFile({
+                ... params,
+                success (res: WechatMiniprogram.ChooseMessageFileSuccessCallbackResult) {
+                    resolve(
+                        // @ts-ignore
+                        res?.tempFilePaths || 
+                        (res?.tempFiles && res.tempFiles[0] ? [res?.tempFiles[0]?.path] : [])
+                    )
+                }
+            })
+            // #endif
+            return
+        }
+        // @ts-ignore
+        if(uni?.chooseFile) {
+            // #ifdef H5
+            uni.chooseFile({
+                ... params,
+                success: function (res) {
+                    resolve(res.tempFilePaths || [])
+                }
+            });
+            return ;
+            // #endif
+        }
+		// #ifdef MP-ALIPAY || APP
 		toast("请在「APP」内进行操作, 未安装请先前往下载!");
-		resolve([])
-		// #endif
-		// #ifdef APP
-		toast("当前版本不支持, 请下载最新版本!");
 		resolve([])
 		// #endif
 	})
