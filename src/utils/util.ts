@@ -1,4 +1,4 @@
-import { isArray, isNumber, isObject, isString } from "./is";
+import { isArray, isNumber, isObject, isString, isSafari, isIpad, isIphone, isIpod } from "./is";
 import { KeyValue } from './get';
 import { TinyColor } from "@ctrl/tinycolor";
 
@@ -397,4 +397,73 @@ export function throttle(func: Function, time: number) {
 			}, time)
 		}
 	}
+}
+export type CopyOptionsType = {
+    /** @desc 复制成功提示， 不传不提示 **/
+    tip: string,
+    success?: Function,
+    fail?: Function
+}
+
+/**
+ * @description 复制文本内容
+ * @param val { string } 复制文本内容
+ * @param options { CopyOptionsType } 可选内容
+ * @param options.tip { string } 复制成功提示文本，不传则不提示
+ * @param options.success { Function } 复制成功回调
+ * @param options.fail { Function } 复制失败回调
+ */
+export function copyValue (val: string, options?: CopyOptionsType) {
+    const { tip, success, fail } = options || {};
+    // #ifdef H5 
+    // @ts-ignore
+    if(document && window?.getSelection){
+        let platform = ''
+        if( isSafari() || isIpad() || isIphone() || isIpod() ) platform = 'ios';
+        try {
+            if (platform == 'ios') {
+                // @ts-ignore
+                window.getSelection().removeAllRanges(); //这段代码必须放在前面否则无效
+                let inputDom = document.createElement('input');
+                document.body.appendChild(inputDom); // 把标签添加给body
+                // @ts-ignore
+                inputDom.style.opacity = 0; //设置input标签设置为透明(不可见)
+                inputDom.value = val; // 修改文本框的内容
+                let range = document.createRange();
+                // 选中需要复制的节点
+                range.selectNode(inputDom);
+                // 执行选中元素
+                // @ts-ignore
+                window.getSelection().addRange(range);
+                inputDom.select();
+                inputDom.setSelectionRange(0, inputDom.value.length); //适配高版本ios
+                // 执行 copy 操作
+                document.execCommand('copy');
+                // @ts-ignore
+                window.getSelection().removeAllRanges();
+                document.body.removeChild(inputDom)
+            } else {
+                var _input = document.createElement('input')
+                _input.value = val;
+                document.body.appendChild(_input)
+                _input.select()
+                document.execCommand('Copy')
+                _input.remove()
+            } 
+            tip && toast(tip);
+            success && success();
+        } catch (error) {  }
+        return;
+    }
+	// #endif
+	// #ifndef H5
+	uni?.setClipboardData && uni.setClipboardData({
+		data: val,
+		success: () => {
+            tip && toast(tip);
+            success && success();
+        },
+		fail: () => fail && fail()
+	});
+	// #endif
 }
