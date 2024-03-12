@@ -101,7 +101,32 @@ export function base64decode (str: string): string {
     }
     return out;
 }
-    
+export interface ToastOptionType {
+
+}
+export function toast (
+    title: string | UniApp.ShowToastOptions, 
+    icon?: "none" | "success" | "loading" | "error" | "fail" | "exception", 
+    mask?: boolean, duration?: number
+    ) {
+    if(!uni?.showToast) return ;
+    if(isString(title)){
+        const options: UniApp.ShowToastOptions = {
+            title: title as string,
+            icon: "none",
+            mask: false
+        };
+        if(mask) options.mask = mask;
+        if(duration) options.duration = duration;
+        if(icon) options.icon = icon;
+        uni.showToast(options)
+    }
+    else {
+        uni.showToast(title as UniApp.ShowToastOptions);
+    }
+}
+
+
 /**
  * @description 返回上一级
  * @param delta { number } 返回的层级数量
