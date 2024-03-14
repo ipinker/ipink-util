@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import dts from "vite-plugin-dts";
 import {defineConfig} from "vite";
 

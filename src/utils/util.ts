@@ -368,7 +368,7 @@ export function allSettled <T, E> (promiseList: Promise<T | E>[]): Promise<(Awai
  */
 export function debounce(func: Function, time: number): Function {
 	if (!time || time <= 0) return func;
-	let timeId: number | undefined = undefined;
+	let timeId: any = undefined;
 	return function(...args : any[]) {
 		clearTimeout(timeId);
 		timeId = setTimeout(() => {
@@ -385,7 +385,7 @@ export function debounce(func: Function, time: number): Function {
  * @return: 
  */
 export function throttle(func: Function, time: number) {
-	let timeId: number | undefined = undefined,
+	let timeId: any = undefined,
 		start: number | undefined;
 	return function(...args : any[]) {
 		let now: number | undefined = new Date().getTime();
