@@ -49,6 +49,10 @@ export interface PinYinTranslateExtOptions extends PinYinTranslateOptions {
     lowerCase?: boolean
 }
 type Use_Key = keyof PinyinTranslate
+export type TranslateResult = {
+    value: string
+    valueArr: string[]
+}
 class PinyinTranslate {
 	static instance: PinyinTranslate | null = null;
 	mode: PinYinTranslateMode = 0;
@@ -75,6 +79,12 @@ class PinyinTranslate {
 		if(!options) return;
 		this.initInstance(options, ext);
 	}
+    /**
+     * @desc 初始化实例
+     * @param options 配置选项或者模式ID { PinYinTranslateOptions | PinYinTranslateMode }
+     * @param extOptions { PinYinTranslateOptions }
+     * @return: 
+     */
 	initInstance(
         options: PinYinTranslateOptions | PinYinTranslateMode, 
         ext?: PinYinTranslateOptions
@@ -107,7 +117,12 @@ class PinyinTranslate {
 		else PinyinTranslate.instance.initInstance(options, ext);
 		return PinyinTranslate.instance;
 	}
-	value(val: string) {
+    /**
+     * @desc 获取指定字符串的拼音
+     * @param val 指定字符串 { string }
+     * @return: { value, valueArr }
+     */
+	value(val: string): TranslateResult {
 		val = val || "";
 		// 空格效验
 		// 汉字效验
@@ -115,16 +130,16 @@ class PinyinTranslate {
         const func : Function = this[ modeKey as Use_Key ] as Function;
 		return func(val);
 	}
-	createMode0(val: string) {
+	createMode0(val: string): TranslateResult {
 		return this.translate(val);
 	}
-	createMode1(val: string) {
+	createMode1(val: string): TranslateResult {
 		return this.translate(val, { trimAll: true, firstChar: true });
 	}
-	createMode2(val: string) {
+	createMode2(val: string): TranslateResult {
 		return this.translate(val.trim().slice(0, 1), { firstChar: true });
 	}
-	createMode10(val: string) {
+	createMode10(val: string): TranslateResult {
 		const {surname, name} = this.splitName(val.trim());
 		const result1 = this.translate(surname);
 		const result2 = this.translate(name, { lowerCase: true });
@@ -133,18 +148,23 @@ class PinyinTranslate {
 			valueArr: result1.valueArr.concat(result2.valueArr)
 		}
 	}
-	createMode11(val: string) {		
+	createMode11(val: string): TranslateResult {		
 		const surname = this.splitName(val.trim()).surname;
 		const result = this.translate(surname);
 		return result
 	}
-	createMode12(val: string, options?: PinYinTranslateExtOptions) {	
+	createMode12(val: string, options?: PinYinTranslateExtOptions): TranslateResult {	
 		const name = this.splitName(val.trim()).name;
 		const result = this.translate(name);
 		return result
 	}
-	
-	translate(val: string = "", options?: PinYinTranslateExtOptions) {
+	/**
+     * @desc 字符/拼音转换
+     * @param val 指定字符串 { string }
+     * @param val 指定字符串 { string }
+     * @return: 
+     */
+	translate(val: string = "", options?: PinYinTranslateExtOptions): TranslateResult {
 		const { split = "", trim, trimAll, firstChar = false, lowerCase = false } = { ... this.options, ... (options || {})};
 		let len = val.length,
 			value = "",

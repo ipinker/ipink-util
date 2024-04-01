@@ -49,7 +49,7 @@ export class Cache {
 		}
 		return true;
 	}
-	
+	setItem = this.set;
     /**
      * @desc 获取缓存
      * @param key 存储Key { string }
@@ -82,6 +82,7 @@ export class Cache {
 			return "";
 		}
 	}
+    getItem = this.get
 	
     /**
      * @desc 删除指定缓存

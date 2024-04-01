@@ -19,10 +19,11 @@
             "dom"
         ],
         "types": [
-            "vite/client",
             "@dcloudio/types",
+            "vite/client",
             "mini-types/types",
-            "miniprogram-api-typings"
+            "miniprogram-api-typings",
+            "./src/global.ts"
         ]
     },
     "include": [
