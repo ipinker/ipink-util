@@ -353,7 +353,7 @@ export type GregorianKeyType = keyof ( typeof defaultGregorian );
  * @公历转农历：calendar.solar2lunar(1987,11,01); //[you can ignore params of prefix 0]
  * @农历转公历：calendar.lunar2solar(1987,09,10); //[you can ignore params of prefix 0]
  */
-class Calendar {
+export class Calendar {
 	constructor() {}
 	/**
 	 * 农历1900-2100的润大小信息表
@@ -983,4 +983,4 @@ class Calendar {
 	}
 }
 var calendar = new Calendar();
-export default calendar
+export const CalendarInstance = calendar

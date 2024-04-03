@@ -53,7 +53,7 @@ export type TranslateResult = {
     value: string
     valueArr: string[]
 }
-class PinyinTranslate {
+export class PinyinTranslate {
 	static instance: PinyinTranslate | null = null;
 	mode: PinYinTranslateMode = 0;
 	
@@ -232,4 +232,3 @@ class PinyinTranslate {
 }
 
 export const Pinyin = PinyinTranslate.createInstance;
-export default PinyinTranslate;

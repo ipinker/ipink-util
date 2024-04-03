@@ -260,4 +260,4 @@ export class Loan {
 }
 
 
-export default Loan.getInstance();
+export const LoanInstance =  Loan.getInstance();
