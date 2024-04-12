@@ -6,20 +6,11 @@ export interface CacheValue {
 }
 type GetCahe = (key: string) => CacheValue | string;
 type SetCahe = (key: string, value: string) => any;
-const isUni = !!(uni && uni.getStorage)
-const isWx = !!(wx && wx.getStorage)
-const setItem: SetCahe = isUni ? uni.setStorageSync : 
-    isWx ? wx.setStorageSync : 
-    window.localStorage.setItem;
-const getItem: GetCahe = (isUni ? uni.getStorageSync : 
-    isWx ? wx.getStorageSync : 
-    window.localStorage.getItem) as GetCahe;
-const removeItem = isUni ? uni.removeStorageSync : 
-    isWx ? wx.removeStorageSync : 
-    window.localStorage.removeItem;
-const clear = isUni ? uni.clearStorageSync : 
-    isWx ? wx.clearStorageSync : 
-    window.localStorage.clear;
+const isUni = !!(uni && uni.getStorage);
+const setItem: SetCahe = isUni ? uni.setStorageSync : window.localStorage.setItem;
+const getItem: GetCahe = (isUni ? uni.getStorageSync : window.localStorage.getItem) as GetCahe;
+const removeItem = isUni ? uni.removeStorageSync : window.localStorage.removeItem;
+const clear = isUni ? uni.clearStorageSync : window.localStorage.clear;
 
 export class Cache {
 	static #instance: Cache | null = null;
