@@ -198,26 +198,6 @@ export function uuid(): string {
 	return uuid;
 }
 
-// 删除url指定部分
-export function delUrlParams (url: string, names: string[] | string = []): string {
-	const urlArr: string[] = url.split('?');
-    const search: string = urlArr[1];
-    if(!search) return url;
-    const query: { [propName: string] : string } = {}
-    const arr: string[] = search.split("&");
-    for (let i = 0; i < arr.length; i++) {
-        let [key, value] = arr[i].split("=");
-        query[key] = value;
-    };
-    if(isString(names)) names = [ names as string ];
-    for (let i = 0; i < names.length; i++) {
-        delete query[names[i]]
-    }
-    let queryStr = JSON.stringify(query).replace(/[\"\{\}]/g, "").replace(/\:/g, "=").replace(/\,/g, "&");
-    let prefix = urlArr[0];
-    return prefix + "?" + queryStr;
-}
-
 
 /**
  * @desc 填充字符串
