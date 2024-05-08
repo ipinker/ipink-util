@@ -199,6 +199,7 @@ export const isTel = (tel: string, telType: number = 3): boolean => {
 		telType == 2 ? /^0\d{2,3}(-)?\d{7,8}-\d{1,6}$/ :
 		/^0\d{2,3}(-)?\d{7,8}(-\d{1,6})?$/;
 	let P:RegExp = /^1[3,4,5,6,7,8,9]\d{9}$/;
+    
 	return telType == 4 ? (T.test(tel) || T2.test(tel) || P.test(tel)) : (T2.test(tel) || T.test(tel));
 };
 
@@ -312,10 +313,63 @@ export const isIphone = (): boolean => {
 export const isIpod = (): boolean => {
 	return userAgent.match(/ipod.+?os (\d+)/) !== null;
 };
-// Android
-export const isAndroid = (): boolean => {
-	return userAgent.indexOf('Android') > -1 || userAgent.indexOf('Adr') > -1;
+// 是否为 IOS 设备 for  h5 | uniapp
+export const isIos = (): boolean => {
+    // #ifdef H5
+    if(userAgent){
+        return isIpad() || isIphone() || isIpod()
+    }
+    // #endif 
+	const SystemInfo = uni?.getSystemInfoSync && uni.getSystemInfoSync();
+    // 非 H5 ｜ uniapp 平台不支持判断
+    if(!SystemInfo) return false;
+	else {
+        if (SystemInfo.platform) return SystemInfo.platform.toLowerCase().indexOf("ios") > -1;
+        if (SystemInfo.osName) return SystemInfo.osName.toLowerCase().indexOf("ios") > -1;
+        if (SystemInfo.system) return SystemInfo.system.toLowerCase().indexOf("ios") > -1;
+    }
+	return false;
 };
+// 是否为安卓设备 for h5 | uniapp
+export const isAndroid = (): boolean => {
+    // #ifdef H5
+    if(userAgent) {
+        return userAgent.indexOf('Android') > -1 || userAgent.indexOf('Adr') > -1;
+    }
+    // #endif 
+	const SystemInfo = uni?.getSystemInfoSync && uni.getSystemInfoSync();
+    // 非 H5 ｜ uniapp 平台不支持判断
+    if(!SystemInfo) return false;
+    else {
+        if (SystemInfo.platform) return SystemInfo.platform.toLowerCase().indexOf("android") > -1;
+        if (SystemInfo.osName) return SystemInfo.osName.toLowerCase().indexOf("android") > -1;
+        if (SystemInfo.system) return SystemInfo.system.toLowerCase().indexOf("android") > -1;
+    }
+	return false;
+};
+
+//是否为小程序环境  h5 | uniapp
+export const isMini = (): boolean => {
+	// #ifdef H5
+	if (
+		navigator && navigator.userAgent &&
+		(
+            navigator.userAgent.indexOf("Mini") > -1 || 
+            navigator.userAgent.indexOf('mini') > -1
+        )
+	) return true;
+	// #endif
+	const SystemInfo = uni?.getSystemInfoSync && uni.getSystemInfoSync();
+    // 非 H5 ｜ uniapp 平台不支持判断
+    if(SystemInfo && SystemInfo.uniPlatform && SystemInfo.uniPlatform.startsWith("mp")) return true;
+
+	// #ifndef MP
+	return false;
+	// #endif
+	// #ifdef MP
+	return true
+	// #endif
+}
 
 // windows 浏览器
 export const isWindows = (): boolean => /win/.test(platform);

@@ -1,3 +1,4 @@
+import { getPageUrl } from "./get"
 import { isString } from "./is"
 
 
@@ -24,7 +25,7 @@ export function decode(str: string): string {
 interface QueryType {
 	[propName : string] : any
 }
-// 将urlquery字符串转化为url字符串
+// 将url query字符串转化为url query 对象
 export function parseQuery(query: string) : QueryType {
 	const res: QueryType = {}
 
@@ -52,6 +53,7 @@ export function parseQuery(query: string) : QueryType {
 
 	return res
 }
+
 
 // 将url的query对象转化为url字符串
 export function stringifyQuery(obj : QueryType): string {
@@ -89,6 +91,12 @@ export function stringifyQuery(obj : QueryType): string {
 	return res ? `?${res}` : ''
 }
 
+export const getUrlByQuery = stringifyQuery;
+export const getQueryByUrl = (url?: string) => {
+    
+	url = url || getPageUrl().currentPageLong || "";
+    return parseQuery(url.split("?")[1] || "");
+};
 
 // 删除url指定部分
 export function delUrlParams(url : string, names : string[] | string = []) : string {
@@ -111,3 +119,11 @@ export function delUrlParams(url : string, names : string[] | string = []) : str
 }
 
 export const deleteQuery = delUrlParams;
+
+/** @desc 根据Key获取query中的value **/
+export function getQueryMember (queryName: string, url?: string) {
+	url = url || getPageUrl().currentPageLong || "";
+
+    const query: QueryType = parseQuery(url.split('?')[1] || "");
+    return query[queryName];
+}

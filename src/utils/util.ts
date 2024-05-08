@@ -454,3 +454,9 @@ export function copyValue (val: string, options?: CopyOptionsType) {
 	});
 	// #endif
 }
+
+/** @desc key 是否在对象上 **/
+export function hasKey (obj: { [propName: string] : any }, key: string) {
+    return Object.prototype.hasOwnProperty.call(obj, key)
+}
+

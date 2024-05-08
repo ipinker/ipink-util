@@ -93,37 +93,6 @@ export function getBirthByID (idCard: string): string {
 }
 
 /**
- * @desc 将 query 转化为 url`s search
- * @param param { type }
- * @return: 
- */
-export function getUrlByQuery (query: any): string {
-	let str: string = "";
-	if(isObject(query)){
-		for (const key in query) {
-			str = `${str+key}=${query[key]}&`
-		}
-		str = str.endsWith("&") ? str.slice(0, str.length-1) : str;
-	}
-	return str;
-}
-
-
-// 对象转URL Param
-export function getQueryByUrl (url: string): KeyValue<string> {
-	const [_, search]: string[] = url.split('?');
-    if(!search) return {};
-    const query: KeyValue<string> = {}
-    const arr: string[] = search.split("&");
-    for (let i = 0; i < arr.length; i++) {
-        let [key, value] = arr[i].split("=");
-        query[key] = value;
-    };
-    return query
-}
-
-
-/**
  * @desc 将目标转化为JSON string => JSON | JSON -> JSON
  * @param param { type }
  * @return: 

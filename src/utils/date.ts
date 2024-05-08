@@ -45,8 +45,9 @@ export const parseDate = (target: unknown): Date | null => {
  * @return: 
  */
 export const getDate = (
-        time: DateValue | undefined, type: -1 | 0 | 1 | 2 | 3 | 4 | 5, s: string = "/"
+        time?: DateValue | undefined, type?: -1 | 0 | 1 | 2 | 3 | 4 | 5, s?: string
     ): DateInfo | string => {
+    s = s || "/";
 	let date: Date = new Date(); 
 	if(isNumber(time)) date = new Date(time as number);
 	else if(isString(time)){
