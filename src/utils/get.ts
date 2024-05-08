@@ -1,5 +1,5 @@
 import { TinyColor } from "@ctrl/tinycolor";
-import { isObject } from "./is";
+import { isArray, isObject } from "./is";
 import { compareVersion } from "./util";
 export interface KeyValue<T> {
     [ propName: string ]: T
@@ -94,7 +94,7 @@ export function getBirthByID (idCard: string): string {
 
 /**
  * @desc 将目标转化为JSON string => JSON | JSON -> JSON
- * @param param { type }
+ * @param JSONstring { any }
  * @return: 
  */
 export function getJson (target: any) {
@@ -102,9 +102,20 @@ export function getJson (target: any) {
 	try {
 		json = JSON.parse(target);
 	} catch (err) {
-		json = {};
+        if(!isObject(json) && !isArray(json)) json = {};
 	}
 	return json;
+}
+
+/**
+ * @desc 获取一个json字符串中的某个成员的值
+ * @param JSONstring { string }
+ * @param key { string }
+ * @return: 
+ */
+export function getJsonMember (target: string, key: string) {
+	let json: { [ propName : string ] : any } = getJson(target);
+	return json[key];
 }
 
 /**

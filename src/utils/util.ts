@@ -346,15 +346,28 @@ export function allSettled <T, E> (promiseList: Promise<T | E>[]): Promise<(Awai
  * @param time { number } ms
  * @return: 
  */
-export function debounce(func: Function, time: number): Function {
+export function debounce(func: Function, time: number, immediate?: boolean): Function {
 	if (!time || time <= 0) return func;
 	let timeId: any = undefined;
-	return function(...args : any[]) {
-		clearTimeout(timeId);
-		timeId = setTimeout(() => {
-            // @ts-ignore
-			func.apply(this, args);
-		}, time)
+    
+	return function() {
+		if(timeId) clearTimeout(timeId);
+        if(immediate) {
+            const isCall = !timeId;
+            timeId = setTimeout(() => {
+                timeId = null;
+            }, time)
+            if(isCall){
+                // @ts-ignore
+                func.apply(this, arguments);
+            }
+        }
+        else {
+            timeId = setTimeout(() => {
+                // @ts-ignore
+                func.apply(this, arguments);
+            }, time)
+        }
 	}
 }
 

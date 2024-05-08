@@ -257,6 +257,96 @@ export const isIdCard = (code: string): boolean => {
 	return true;
 };
 
+// 是否是居留证往版（老版本）
+const isJuLiuCardV1 = (code: string) => {
+	if(!code || !isString(code)) {
+		console.error('为获取到正确的居留证件码!')
+		return false
+	}
+	// 证件长度为 15
+	if(code.length !== 15) return false
+	// 国家和地区代码（1~3） 单个字母 对应的阿拉伯数字
+	const map = {
+		A: 10,
+		B: 11,
+		C: 12,
+		D: 13,
+		E: 14,
+		F: 15,
+		G: 16,
+		H: 17,
+		I: 18,
+		J: 19,
+		K: 20,
+		L: 21,
+		M: 22,
+		N: 23,
+		O: 24,
+		P: 25,
+		Q: 26,
+		R: 27,
+		S: 28,
+		T: 29,
+		U: 30,
+		V: 31,
+		W: 32,
+		X: 33,
+		Y: 34,
+		Z: 35
+	} as const; 
+    type MapType = keyof (typeof map)
+	// 无限循环 7 3 1 加权因子
+	let wiArr = [7, 3, 1];
+	const codeArr = code.split('')
+	// 最后一位校验位
+	let checkNum = codeArr[codeArr.length - 1]
+	let sum = 0
+	codeArr.forEach((v, index) => {
+		// 证件长度为 15 去除最后一位校验位
+		if (index > 13) return
+		// 转换地区编码
+		let n = map[v as MapType] || v
+		//  证件各位 乘以加权因子 相加
+		sum += n * wiArr[index % 3]
+	});
+	// 模数为10 取 余数
+	const ai = sum % 10
+	// 余数与校验位对比
+	return "" + ai == "" + checkNum
+}
+
+// 是否是居留证新版
+const isJuLiuCardV2 = (code: string) => {
+	if(!code || !isString(code)) {
+		console.error('为获取到正确的居留证件码!')
+		return false
+	}
+	// 长度为18
+	if(code.length !== 18) return false
+	// 新版必须是9开头
+	if(!code.startsWith('9')) return false
+	// 加权因子
+	let wiArr = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+	const codeArr = code.split('')
+	// 校验码字符集
+	let aiArr = [1, 0, 'X', 9, 8, 7, 6, 5, 4, 3, 2];
+	// 最后校验位
+	let checkNum = codeArr[17].toUpperCase()
+	let sum = 0
+	codeArr.forEach((v, index) => {
+		// 长度为18 去除最后一位校验位
+		if (index > 16) return
+		// 与加权因子相乘 并且累加
+		sum += Number(v) * wiArr[index]
+	});
+	// 累加和 模数 11 取余数作为索引从校验码合集获取校验码
+	const ai = aiArr[sum % 11]
+	return ai == checkNum
+}
+
+// 是否是居留证(兼容新老版本)
+export const isJuLiuCard = (code: string) => isJuLiuCardV1(code) || isJuLiuCardV2(code)
+
 // 是否为 IP
 export const isIp = (ip: string): boolean => /^(?:(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(?:\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])$/.test(ip);
 // 是否为 IPv6
