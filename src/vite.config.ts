@@ -5,6 +5,10 @@ import {defineConfig} from "vite";
 export default defineConfig({
     base: "./",
     root: "./",
+	esbuild:{
+		minifyIdentifiers: false,
+		keepNames: true,
+	},
     build: {
         // sourcemap: true,
         //打包后文件目录

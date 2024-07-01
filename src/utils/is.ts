@@ -105,6 +105,12 @@ export const isYesterday = (date: any): boolean => {
 	const yesterday: Date = new Date(now.setDate(now.getDate() - 1));
 	return isDate(date) && date.toDateString() === yesterday.toDateString();
 };
+/** 判断是否为外链 */
+export const isExternal = (path: string) => {
+    const reg = /^(http?:|https?:|mailto:|tel:)/
+    return reg.test(path)
+}
+  
 /* --------------------------------end------------------------------------------ */
 
 

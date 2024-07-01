@@ -15,7 +15,7 @@ export interface DateInfo {
     hour?: string | number
     minute?: string | number
     second?: string | number
-    milliSeconds?: string | number
+    milliSecond?: string | number
     time?: number | string
     ymd?: string
     md?: string
@@ -62,7 +62,7 @@ export const getDate = (
 	let hour: string = date.getHours() < 10 ? '0' + date.getHours() : date.getHours() + '';
 	let minute: string = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes() + '';
 	let second: string = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds() + '';
-	let milliSeconds = date.getMilliseconds();
+	let milliSecond = date.getMilliseconds();
 	let currentTime = year + s + month + s + day + ' ' + hour + ':' + minute + ":" + second;
 	if(type == 1) return year + s + month + s + day;
 	else if (type == 2) return hour + ':' + minute;
@@ -78,7 +78,7 @@ export const getDate = (
 			hour,
 			minute,
 			second,
-			milliSeconds
+			milliSecond
 		};
 	}
 	else return currentTime;
@@ -186,19 +186,21 @@ export const getRecentDay = (
  *  @desc 获取某天的具体信息
  *  @param day 目标日期（时间戳， 日期字符串， Date对象） { number | string | Date }
  *  @param split 返回的日期分隔符 { string }
- *  @return (1) => ["2022-12-22", "2022-12-23"]
+ *  @return { DateInfo }
  */
 export const getSomeday = (day: DateValue, split: string = "/"): DateInfo => {
     if(isString(day)) day = (day as string).split("-").join("/");
 	let today = new Date(day);
 
 	let tYear = today.getFullYear();
-	let tMonth = '' + today.getMonth();
-	let tDate = '' + today.getDate();
+	let tMonth = formatNumber(today.getMonth() + 1);
+	let tDate = formatNumber(today.getDate());
 	let tWeek = today.getDay();
 	let tTime = parseInt('' + (today.getTime() / 1000));
-	tMonth = formatNumber(tMonth + 1);
-	tDate = formatNumber(tDate);
+    let hour = formatNumber(today.getHours())
+	let minute = formatNumber(today.getMinutes());
+	let second = formatNumber(today.getSeconds())
+	let milliSecond = today.getMilliseconds();
 
 	const week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
@@ -211,9 +213,14 @@ export const getSomeday = (day: DateValue, split: string = "/"): DateInfo => {
 		'year': tYear,
 		'month': tMonth,
 		'day': tDate,
+        hour,
+        minute,
+        second,
+        milliSecond,
 		'week': week[tWeek],
 		"md": tMonth + split + tDate,
 		"ymd": tYear + split + tMonth + split + tDate,
+		"currentTime": tYear + split + tMonth + split + tDate + " " + hour + ":" + minute + ":" + second,
 	};
 }
 /** 
@@ -363,7 +370,10 @@ type TransformDateOption = {
 export const transformDate = (options : TransformDateOption): string => {
 	let { date, type = 4, sign = "/", lang } = options;
 	if (!date) return "";
-    if(isString(date)) date = (date as string).split("-").join("/");
+    if(isString(date)) {
+		const hasSign = (date as string).indexOf("-") > -1;
+		date = (date as string).split(hasSign ? "-" : "/").join(sign);
+	}
     else date = getDate(date, 1, sign) as string;
 	lang = lang || "zh-Han";
 	const monthLang = new Map([
@@ -449,7 +459,6 @@ export const transformDate = (options : TransformDateOption): string => {
 			);
 		}
 		if (type == 4) {
-			console.log(strArr[2])
 			str = (
 				lang.startsWith('zh-Han') ? strArr[1] + "月" + strArr[2] + "日" :
 					monthLang.get(strArr[1]) + " " + strArr[2]

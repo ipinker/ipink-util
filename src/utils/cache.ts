@@ -1,4 +1,4 @@
-
+var uni: any = uni;
 export interface CacheValue {
     value?: any
     expire?: number
