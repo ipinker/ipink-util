@@ -1,6 +1,6 @@
 {
 	"name": "ipink-util",
-	"version": "1.0.30",
+	"version": "1.0.31",
 	"description": "util.js",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
@@ -44,6 +44,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@dcloudio/types": "^3.4.8",
 		"@ctrl/tinycolor": "^4.0.2"
 	},
 	"license": "ISC"

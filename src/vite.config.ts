@@ -21,9 +21,14 @@ export default defineConfig({
             compress: {
                 // 打包自动删除console
                 drop_console: true,
-                drop_debugger: true
+                drop_debugger: true,
+				keep_fnames: true, 
             },
             keep_classnames: true,
+			mangle: {
+				// 关闭mangle，即不改变变量名
+				keep_fnames: true,
+			},
         },
         rollupOptions: {
             //忽略打包vue文件

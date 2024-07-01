@@ -1,4 +1,4 @@
-var uni: any = uni;
+
 export interface CacheValue {
     value?: any
     expire?: number
@@ -6,7 +6,10 @@ export interface CacheValue {
 }
 type GetCahe = (key: string) => CacheValue | string;
 type SetCahe = (key: string, value: string) => any;
-const isUni = !!(uni && uni.getStorage);
+const isUni = (() => {
+	// @ts-ignore
+	return "undefined" != typeof uni ? uni : "undefined" != wx ? wx : "undefined" != my ? my : "undefined" != qq ? qq : false
+})();
 const setItem: SetCahe = isUni ? uni.setStorageSync : window.localStorage.setItem;
 const getItem: GetCahe = (isUni ? uni.getStorageSync : window.localStorage.getItem) as GetCahe;
 const removeItem = isUni ? uni.removeStorageSync : window.localStorage.removeItem;
