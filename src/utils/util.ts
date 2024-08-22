@@ -114,7 +114,7 @@ export function toast (
     icon?: "none" | "success" | "loading" | "error" | "fail" | "exception", 
     mask?: boolean, duration?: number
     ) {
-    if(!uni?.showToast) return ;
+    if(!uni || !uni.showToast) return ;
     if(isString(title)){
         const options: UniApp.ShowToastOptions = {
             title: title as string,
@@ -141,13 +141,13 @@ export function toast (
 export function navigateBack(delta?: number) {
     delta = delta || 1;
     //#ifdef H5
-    if(window?.history){
+    if(window && window.history){
         window.history.go(Number('-' + delta));
         return 
     }
 	//#endif
 	//#ifndef H5
-	uni?.navigateBack && uni.navigateBack({ delta: delta });
+	uni && uni.navigateBack && uni.navigateBack({ delta: delta });
 	//#endif
 }
 
@@ -417,7 +417,7 @@ export function copyValue (val: string, options?: CopyOptionsType) {
     const { tip, success, fail } = options || {};
     // #ifdef H5 
     // @ts-ignore
-    if(document && window?.getSelection){
+    if(document && window && window.getSelection){
         let platform = ''
         if( isSafari() || isIpad() || isIphone() || isIpod() ) platform = 'ios';
         try {
@@ -457,7 +457,7 @@ export function copyValue (val: string, options?: CopyOptionsType) {
     }
 	// #endif
 	// #ifndef H5
-	uni?.setClipboardData && uni.setClipboardData({
+	uni && uni.setClipboardData && uni.setClipboardData({
 		data: val,
 		success: () => {
             tip && toast(tip);

@@ -154,7 +154,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
 				}
 			)
 		} else {
-            if(!uni?.chooseImage) return resolve([]);
+            if(!uni || !uni.chooseImage) return resolve([]);
 			uni.chooseImage({
 				count: count,
 				// #ifdef H5
@@ -177,7 +177,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
 					resolve(apFilePath);
 				},
 				fail(err) {
-					toast(err?.errMsg || '上传失败!');
+					toast(err && err.errMsg || '上传失败!');
 					resolve([]);
 				}
 			});
@@ -192,7 +192,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
  */
 export function getImageInfo (url: string): Promise<UniApp.GetImageInfoSuccessData | ErrorType> {
     const env = uni || wx;
-    if (!env?.getImageInfo) return Promise.resolve({ msg: "当前环境暂不支持！" })
+    if (!env || !env.getImageInfo) return Promise.resolve({ msg: "当前环境暂不支持！" })
     return new Promise((resolve) => {
         env.getImageInfo({
             src: url,
@@ -333,7 +333,7 @@ export async function pathToBase64 (
 			return
 		}
 		if (typeof wx === 'object' && wx.canIUse('getFileSystemManager')) {
-            if(wx?.getFileSystemManager){
+            if(wx && wx.getFileSystemManager){
                 // #ifdef MP-WEIXIN
                 wx.getFileSystemManager().readFile({
                     filePath: path,
@@ -509,9 +509,9 @@ type ChooseVideoOptions = {
  */
 export function chooseVideo(options?: ChooseVideoOptions): Promise<string[]> {
     let {sourceType = 1, maxDuration, camera, compressed} = options || {};
-    if(!uni?.chooseVideo) return Promise.resolve([])
+    if(!uni || !uni.chooseVideo) return Promise.resolve([])
 	return new Promise((resolve) => {
-		uni?.chooseVideo({
+		uni.chooseVideo({
 			sourceType: sourceType == 2 ? ["album"] : sourceType == 3 ? ["camera"] : ["album", "camera"],
 			maxDuration,
 			camera,
@@ -521,7 +521,7 @@ export function chooseVideo(options?: ChooseVideoOptions): Promise<string[]> {
 			},
 			fail(err) {
 				resolve([])
-				toast(err?.errMsg || '上传失败!');
+				toast(err && err.errMsg || '上传失败!');
 			}
 		});
 	})
@@ -547,19 +547,19 @@ export function chooseOtherFile(options?: ChooseFileOptions) {
 			sourceType: sourceType == 2 ? ["album"] : sourceType == 3 ? ["camera"] : ["album", "camera"],
 			extension: extension,
 			fail: (err: ErrorType) => {
-				toast(err?.errMsg || "上传失败!")
+				toast(err && err.errMsg || "上传失败!")
 				resolve([])
 			}
 		}
-        if(wx?.chooseMessageFile){
+        if(wx && wx.chooseMessageFile){
             // #ifdef MP-WEIXIN || MP-QQ
             wx.chooseMessageFile({
                 ... params,
                 success (res: WechatMiniprogram.ChooseMessageFileSuccessCallbackResult) {
                     resolve(
                         // @ts-ignore
-                        res?.tempFilePaths || 
-                        (res?.tempFiles && res.tempFiles[0] ? [res?.tempFiles[0]?.path] : [])
+                        (res && res.tempFilePaths) || 
+                        (res && res.tempFiles && res.tempFiles[0] ? [res.tempFiles[0].path] : [])
                     )
                 }
             })
@@ -567,7 +567,7 @@ export function chooseOtherFile(options?: ChooseFileOptions) {
             return
         }
         // @ts-ignore
-        if(uni?.chooseFile) {
+        if(uni && uni.chooseFile) {
             // #ifdef H5
             uni.chooseFile({
                 ... params,

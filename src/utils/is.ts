@@ -416,7 +416,7 @@ export const isIos = (): boolean => {
         return isIpad() || isIphone() || isIpod()
     }
     // #endif 
-	const SystemInfo = uni?.getSystemInfoSync && uni.getSystemInfoSync();
+	const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
     // 非 H5 ｜ uniapp 平台不支持判断
     if(!SystemInfo) return false;
 	else {
@@ -433,7 +433,7 @@ export const isAndroid = (): boolean => {
         return userAgent.indexOf('Android') > -1 || userAgent.indexOf('Adr') > -1;
     }
     // #endif 
-	const SystemInfo = uni?.getSystemInfoSync && uni.getSystemInfoSync();
+	const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
     // 非 H5 ｜ uniapp 平台不支持判断
     if(!SystemInfo) return false;
     else {
@@ -455,7 +455,7 @@ export const isMini = (): boolean => {
         )
 	) return true;
 	// #endif
-	const SystemInfo = uni?.getSystemInfoSync && uni.getSystemInfoSync();
+	const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
     // 非 H5 ｜ uniapp 平台不支持判断
     if(SystemInfo && SystemInfo.uniPlatform && SystemInfo.uniPlatform.startsWith("mp")) return true;
 

@@ -18,7 +18,7 @@ export type FormatTArray<T> = T & { children: T[] }
 	for (var i = 0; i < nodeList.length; i++) {
         const item: any = nodeList[i] as T as any;
         const parentId: string = item[parentKey];
-		if (item[parentId] && map[parentId]?.children) {
+		if (item[parentId] && map[parentId] && map[parentId].children) {
 			map[parentId].children.push(nodeList[i]);
 		};
 	}

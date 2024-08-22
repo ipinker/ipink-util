@@ -11,7 +11,7 @@ export interface KeyValue<T> {
 export const getPageUrl = (): { currentPageLong?: string, currentPage?: string } => {
 	// 仅出现在 H5 平台下的代码
 	// #ifdef H5
-    if(window?.location){
+    if(window && window.location){
     	return {
             currentPageLong: window.location.href,
             currentPage: window.location.href
@@ -25,7 +25,7 @@ export const getPageUrl = (): { currentPageLong?: string, currentPage?: string }
 	var pages = getCurrentPages(); //获取加载的页面
 	var currentPage: any = pages[pages.length - 1]; //获取当前页面的对象
 	var url: string = currentPage.route as unknown as string; //当前页面url
-	var options = currentPage?.options; //获取url中所带的参数
+	var options = currentPage && currentPage.options; //获取url中所带的参数
 	//拼接url的参数
 	currentPage = (url + '?');
 	for (var key in options) {
@@ -199,7 +199,7 @@ export function getIdCardInfo(sId: string, type: 0 | 1 | 2): string {
  * @return: 
  */
 export const getCanvas = (id: string, ctx: any): Promise<any> => {
-    if(!uni?.getSystemInfoSync) return Promise.resolve(null);
+    if(!uni || !uni.getSystemInfoSync) return Promise.resolve(null);
 	let context: any = null;
 	let version = uni.getSystemInfoSync().SDKVersion;
 	return new Promise((resolve, reject) => {
