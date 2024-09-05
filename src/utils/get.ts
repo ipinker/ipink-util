@@ -199,26 +199,30 @@ export function getIdCardInfo(sId: string, type: 0 | 1 | 2): string {
  * @return: 
  */
 export const getCanvas = (id: string, ctx: any): Promise<any> => {
-    if(!uni || !uni.getSystemInfoSync) return Promise.resolve(null);
-	let context: any = null;
-	let version = uni.getSystemInfoSync().SDKVersion;
-	return new Promise((resolve, reject) => {
-		if (version && compareVersion(version, "2.9.0") >= 0) {
-			let view: UniApp.NodesRef = uni.createSelectorQuery().in(ctx).select("#" + id)
-			view.fields({
-				node: true
-			}, () => {}).exec(
-				data => {
-					let Canvas = data[0].node;
-					context = Canvas ? Canvas.getContext('2d') : uni.createCanvasContext(id, ctx);
-					resolve(context);
-				}
-			);
-		} else {
-			context = uni.createCanvasContext(id, ctx);
-			resolve(context);
-		}
-	});
+	try{
+		if(!uni || !uni.getSystemInfoSync) return Promise.resolve(null);
+		let context: any = null;
+		let version = uni.getSystemInfoSync().SDKVersion;
+		return new Promise((resolve, reject) => {
+			if (version && compareVersion(version, "2.9.0") >= 0) {
+				let view: UniApp.NodesRef = uni.createSelectorQuery().in(ctx).select("#" + id)
+				view.fields({
+					node: true
+				}, () => {}).exec(
+					data => {
+						let Canvas = data[0].node;
+						context = Canvas ? Canvas.getContext('2d') : uni.createCanvasContext(id, ctx);
+						resolve(context);
+					}
+				);
+			} else {
+				context = uni.createCanvasContext(id, ctx);
+				resolve(context);
+			}
+		});
+	}catch(e){
+		return Promise.resolve(null);
+	}
 }
 
 /**

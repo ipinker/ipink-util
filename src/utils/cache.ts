@@ -4,32 +4,30 @@ export interface CacheValue {
     expire?: number
     createTime?: number
 }
-type GetCahe = (key: string) => CacheValue | string;
-type SetCahe = (key: string, value: string) => any;
 const isUni = (() => {
-	// @ts-ignore
-	return "undefined" != typeof uni ? uni : "undefined" != wx ? wx : "undefined" != my ? my : "undefined" != qq ? qq : false
+	try{
+		// @ts-ignore
+		return "undefined" != typeof uni ? uni : "undefined" != wx ? wx : "undefined" != my ? my : "undefined" != qq ? qq : false
+	}catch(e){
+		return false;
+	}
 })();
-const setItem: SetCahe = isUni ? uni.setStorageSync : window.localStorage.setItem;
-const getItem: GetCahe = (isUni ? uni.getStorageSync : window.localStorage.getItem) as GetCahe;
-const removeItem = isUni ? uni.removeStorageSync : window.localStorage.removeItem;
-const clear = isUni ? uni.clearStorageSync : window.localStorage.clear;
 
 export class Cache {
 	static #instance: Cache | null = null;
 	#id = "";
-	
+
 	static createInstance(id?: string) {
 		if(!Cache.#instance){
 			Cache.#instance = new Cache(id || "");
 		}
 		return Cache.#instance;
 	}
-	
+
 	constructor(id?: string) {
 		this.#id = id || "";
 	}
-	
+
     /**
      * @desc 设置缓存
      * @param key 存储Key { string }
@@ -45,9 +43,10 @@ export class Cache {
 				expire,
 				createTime: Date.now()
 			}
-			setItem(key, JSON.stringify(cacheValue));
+            // @ts-ignore
+			isUni ? uni.setStorageSync(key, JSON.stringify(cacheValue)) : window.localStorage.setItem(key, JSON.stringify(cacheValue));
 		}catch(e){
-			console.error("Cache.set.error: " + e);
+			console.log("Cache.set.error: " + e);
 			return false;
 		}
 		return true;
@@ -58,13 +57,20 @@ export class Cache {
      * @param key 存储Key { string }
      * @return: any
      */
-	get(key: string): any {	
+	get(key: string): any {
 		try{
 			key = this.genKey(key);
-            let cacheValue: CacheValue = (getItem(key) || {}) as CacheValue;
+            let cacheValue: CacheValue;
+            if(isUni) {
+                // @ts-ignore
+                cacheValue = (uni.getStorageSync(key) || {}) as CacheValue;
+            }
+            else {
+                cacheValue = (window.localStorage.getItem(key) || {}) as CacheValue;
+            }
             try { cacheValue = JSON.parse(cacheValue as string) } catch (error) { cacheValue = {} }
-			const { 
-				value = null, 
+			const {
+				value = null,
 				expire = -1,
 				createTime = 0
 			} = cacheValue;
@@ -81,46 +87,50 @@ export class Cache {
 			}
 			return value;
 		}catch(e){
-			console.error("Cache.get.error: " + e);
+			console.log("Cache.get.error: " + e);
 			return "";
 		}
 	}
     getItem = this.get
-	
+
     /**
      * @desc 删除指定缓存
      * @param key 存储Key { string }
      * @return: boolean
      */
-	remove(key: string): boolean {	
+	remove(key: string): boolean {
 		try{
 			key = this.genKey(key);
-			removeItem(key);
+            // @ts-ignore
+            if(isUni) uni.removeStorageSync (key);
+            else window.localStorage.removeItem(key);
             return true;
 		}catch(e){
-			console.error("Cache.remove.error: " , e);
+			console.log("Cache.remove.error: " , e);
             return false;
 		}
 	}
-	
+
     /**
      * @desc 清除缓存
      * @return: boolean
      */
-	clear() {	
+	clear() {
 		try{
-			clear();
+            // @ts-ignore
+            if (isUni) uni.clearStorageSync()
+            else window.localStorage.clear();
             return true;
 		}catch(e){
-			console.error("Cache.clear.error: " + e);
+			console.log("Cache.clear.error: " + e);
             return false;
 		}
 	}
-	
+
 	genKey(key: string): string {
 		return (this.#id ? this.#id + "_" : "") + key;
 	}
-	
+
 }
 
 /** @desc 单例模式 （id: string） **/

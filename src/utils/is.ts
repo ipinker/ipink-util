@@ -416,14 +416,17 @@ export const isIos = (): boolean => {
         return isIpad() || isIphone() || isIpod()
     }
     // #endif 
-	const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
-    // 非 H5 ｜ uniapp 平台不支持判断
-    if(!SystemInfo) return false;
-	else {
-        if (SystemInfo.platform) return SystemInfo.platform.toLowerCase().indexOf("ios") > -1;
-        if (SystemInfo.osName) return SystemInfo.osName.toLowerCase().indexOf("ios") > -1;
-        if (SystemInfo.system) return SystemInfo.system.toLowerCase().indexOf("ios") > -1;
-    }
+	try{
+		const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
+		// 非 H5 ｜ uniapp 平台不支持判断
+		if(!SystemInfo) return false;
+		else {
+		    if (SystemInfo.platform) return SystemInfo.platform.toLowerCase().indexOf("ios") > -1;
+		    if (SystemInfo.osName) return SystemInfo.osName.toLowerCase().indexOf("ios") > -1;
+		    if (SystemInfo.system) return SystemInfo.system.toLowerCase().indexOf("ios") > -1;
+		}
+	}catch(e){
+	}
 	return false;
 };
 // 是否为安卓设备 for h5 | uniapp
@@ -433,14 +436,17 @@ export const isAndroid = (): boolean => {
         return userAgent.indexOf('Android') > -1 || userAgent.indexOf('Adr') > -1;
     }
     // #endif 
-	const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
-    // 非 H5 ｜ uniapp 平台不支持判断
-    if(!SystemInfo) return false;
-    else {
-        if (SystemInfo.platform) return SystemInfo.platform.toLowerCase().indexOf("android") > -1;
-        if (SystemInfo.osName) return SystemInfo.osName.toLowerCase().indexOf("android") > -1;
-        if (SystemInfo.system) return SystemInfo.system.toLowerCase().indexOf("android") > -1;
-    }
+	try{
+		const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
+		// 非 H5 ｜ uniapp 平台不支持判断
+		if(!SystemInfo) return false;
+		else {
+			if (SystemInfo.platform) return SystemInfo.platform.toLowerCase().indexOf("android") > -1;
+			if (SystemInfo.osName) return SystemInfo.osName.toLowerCase().indexOf("android") > -1;
+			if (SystemInfo.system) return SystemInfo.system.toLowerCase().indexOf("android") > -1;
+		}
+	}catch(e){
+	}
 	return false;
 };
 
@@ -455,10 +461,13 @@ export const isMini = (): boolean => {
         )
 	) return true;
 	// #endif
-	const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
-    // 非 H5 ｜ uniapp 平台不支持判断
-    if(SystemInfo && SystemInfo.uniPlatform && SystemInfo.uniPlatform.startsWith("mp")) return true;
-
+	try{
+		const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
+		// 非 H5 ｜ uniapp 平台不支持判断
+		if(SystemInfo && SystemInfo.uniPlatform && SystemInfo.uniPlatform.startsWith("mp")) return true		
+	}catch(e){
+		//TODO handle the exception
+	}
 	// #ifndef MP
 	return false;
 	// #endif

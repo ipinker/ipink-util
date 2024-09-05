@@ -114,23 +114,28 @@ export function toast (
     icon?: "none" | "success" | "loading" | "error" | "fail" | "exception", 
     mask?: boolean, duration?: number
     ) {
-    if(!uni || !uni.showToast) return ;
-    if(isString(title)){
-        const options: UniApp.ShowToastOptions = {
-            title: title as string,
-            icon: "none",
-            mask: false
-        };
-        if(mask) options.mask = mask;
-        if(duration) options.duration = duration;
-        if(icon) options.icon = icon;
-        uni.showToast(options)
-    }
-    else {
-        const options = title as UniApp.ShowToastOptions;
-        options.icon = options.icon || "none";
-        uni.showToast(options);
-    }
+	try{
+		
+		if(!uni || !uni.showToast) return ;
+		if(isString(title)){
+			const options: UniApp.ShowToastOptions = {
+				title: title as string,
+				icon: "none",
+				mask: false
+			};
+			if(mask) options.mask = mask;
+			if(duration) options.duration = duration;
+			if(icon) options.icon = icon;
+			uni.showToast(options)
+		}
+		else {
+			const options = title as UniApp.ShowToastOptions;
+			options.icon = options.icon || "none";
+			uni.showToast(options);
+		}
+	}catch(e){
+		//TODO handle the exception
+	}
 }
 
 
@@ -147,7 +152,10 @@ export function navigateBack(delta?: number) {
     }
 	//#endif
 	//#ifndef H5
-	uni && uni.navigateBack && uni.navigateBack({ delta: delta });
+	try{
+		uni && uni.navigateBack && uni.navigateBack({ delta: delta });
+	}catch(e){
+	}
 	//#endif
 }
 
@@ -457,14 +465,18 @@ export function copyValue (val: string, options?: CopyOptionsType) {
     }
 	// #endif
 	// #ifndef H5
-	uni && uni.setClipboardData && uni.setClipboardData({
-		data: val,
-		success: () => {
-            tip && toast(tip);
-            success && success();
-        },
-		fail: () => fail && fail()
-	});
+	try{
+		uni && uni.setClipboardData && uni.setClipboardData({
+			data: val,
+			success: () => {
+		        tip && toast(tip);
+		        success && success();
+		    },
+			fail: () => fail && fail()
+		});
+	}catch(e){
+		//TODO handle the exception
+	}
 	// #endif
 }
 
