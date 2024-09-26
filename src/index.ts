@@ -1,5 +1,6 @@
 export * from "./utils/is";
 export * from "./utils/get";
+export * from "./utils/set";
 export * from "./utils/date";
 export * from "./utils/util";
 export * from "./utils/calendar";
