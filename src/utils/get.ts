@@ -11,7 +11,7 @@ export interface KeyValue<T> {
 export const getPageUrl = (): { currentPageLong?: string, currentPage?: string } => {
 	// 仅出现在 H5 平台下的代码
 	// #ifdef H5
-    if(window && window.location){
+    if(typeof window !== "undefined" && window && window.location){
     	return {
             currentPageLong: window.location.href,
             currentPage: window.location.href
@@ -24,7 +24,7 @@ export const getPageUrl = (): { currentPageLong?: string, currentPage?: string }
 	// 除了 H5 平台，其它平台均存在的代码
 	var pages = getCurrentPages(); //获取加载的页面
 	var currentPage: any = pages[pages.length - 1]; //获取当前页面的对象
-	var url: string = currentPage.route as unknown as string; //当前页面url
+	var url: string = currentPage?.route || ""; //当前页面url
 	var options = currentPage && currentPage.options; //获取url中所带的参数
 	//拼接url的参数
 	currentPage = (url + '?');
@@ -32,9 +32,7 @@ export const getPageUrl = (): { currentPageLong?: string, currentPage?: string }
 		var value = options[key]
 		currentPage += key + '=' + value + '&';
 	}
-	currentPage = currentPage.substring(0, currentPage.length -
-		1
-	);
+	currentPage = currentPage.substring(0, currentPage.length - 1);
 	//得到的值为当前页面及页面地址链接的参数 示例：  outpatientService/yuyue/index?outPatientNumber=111
 	let _currentPage = '/' + currentPage
 	let currentPageLong = '/' + currentPage; //当前页面的全链接
