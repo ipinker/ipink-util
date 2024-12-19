@@ -38,6 +38,7 @@ export const isUndefined = (value: any, checkString: boolean = false): boolean =
 export const isOdd = (num: any): boolean => isNumber(num) && (num % 2 === 1 || num % 2 === -1);
 // 是否为正则对象
 export const isRegexp = (error: any): boolean => Object.prototype.toString.call(error) === "[object RegExp]";
+export const isRegexpStr = (str: string): boolean => eval(str) instanceof RegExp;
 /* 对象判断 */
 // 数组是否包含
 export const isInArray = (value: any, array: any[] = []): boolean => {
@@ -208,6 +209,7 @@ export const isTel = (tel: string, telType: number = 3): boolean => {
     
 	return telType == 4 ? (T.test(tel) || T2.test(tel) || P.test(tel)) : (T2.test(tel) || T.test(tel));
 };
+export const isZipCode = (code: string) => /^[0-9]\d{5}$/.test(code);
 
 // 是否为手机号
 export const isPhoneNumber = (phone: string): boolean => /^1[3,4,5,6,7,8,9]\d{9}$/.test(phone);
