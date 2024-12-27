@@ -196,9 +196,9 @@ export const compareVersion = (v1: string, v2: string): -1 | 0 | 1 => {
  * @desc 生成GUID
  * @return: { string }
  */
-export function uuid(): string {
+export function uuid(sign = "-"): string {
 	let d: number = new Date().getTime();
-	let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	let uuid = `xxxxxxxx${sign}xxxx${sign}4xxx${sign}yxxx${sign}xxxxxxxxxxxx`.replace(/[xy]/g, function(c) {
 		var r = (d + Math.random() * 16) % 16 | 0;
 		d = Math.floor(d / 16);
 		return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
