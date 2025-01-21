@@ -9,3 +9,4 @@ export * from "./utils/pinyin";
 export * from "./utils/cache";
 export * from "./utils/image";
 export * from "./utils/url";
+export * from "./utils/log";
