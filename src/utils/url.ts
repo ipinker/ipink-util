@@ -70,13 +70,13 @@ export function stringifyQuery(obj : QueryType): string {
 					const result: string[] = []
 					val.forEach(val2 => {
 						if (val2 === undefined) return
-							
+
 						if (val2 === null) result.push(encode(key))
-						
+
 						// 去除编码 防止多次编码
 						// result.push(encode(key) + '=' + encode(val2))
 						else result.push(encode(key) + '=' + val2)
-							
+
 					})
 					return result.join('&')
 				}
@@ -93,8 +93,7 @@ export function stringifyQuery(obj : QueryType): string {
 
 export const getUrlByQuery = stringifyQuery;
 export const getQueryByUrl = (url?: string) => {
-    
-	url = url || getPageUrl().currentPageLong || "";
+	url = url || getPageUrl() || "";
     return parseQuery(url.split("?")[1] || "");
 };
 
@@ -122,8 +121,9 @@ export const deleteQuery = delUrlParams;
 
 /** @desc 根据Key获取query中的value **/
 export function getQueryMember (queryName: string, url?: string) {
-	url = url || getPageUrl().currentPageLong || "";
+	url = url || getPageUrl() || "";
 
     const query: QueryType = parseQuery(url.split('?')[1] || "");
     return query[queryName];
 }
+
