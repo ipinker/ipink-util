@@ -1,6 +1,8 @@
 import { isArray, isNumber, isObject, isString, isSafari, isIpad, isIphone, isIpod } from "./is";
-import { KeyValue } from './get';
-import { TinyColor } from "@ctrl/tinycolor";
+import {getPageUrl, KeyValue} from './get';
+import {ENV_TYPE, getEnv} from "./env";
+import {sdk} from "./config";
+import {toast} from "./toast";
 
 
 const base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -102,42 +104,6 @@ export function base64decode (str: string): string {
     return out;
 }
 
-/**
- * @desc Uni.showToast 快捷调用
- * @param title { string | UniApp.ShowToastOptions } 
- * @param icon { "none" | "success" | "loading" | "error" | "fail" | "exception" } default "none"
- * @param mask { boolean } default false
- * @return: 
- */
-export function toast (
-    title: string | UniApp.ShowToastOptions, 
-    icon?: "none" | "success" | "loading" | "error" | "fail" | "exception", 
-    mask?: boolean, duration?: number
-    ) {
-	try{
-		
-		if(!uni || !uni.showToast) return ;
-		if(isString(title)){
-			const options: UniApp.ShowToastOptions = {
-				title: title as string,
-				icon: "none",
-				mask: false
-			};
-			if(mask) options.mask = mask;
-			if(duration) options.duration = duration;
-			if(icon) options.icon = icon;
-			uni.showToast(options)
-		}
-		else {
-			const options = title as UniApp.ShowToastOptions;
-			options.icon = options.icon || "none";
-			uni.showToast(options);
-		}
-	}catch(e){
-		//TODO handle the exception
-	}
-}
-
 
 /**
  * @description 返回上一级
@@ -148,7 +114,7 @@ export function navigateBack(delta?: number) {
     //#ifdef H5
     if(window && window.history){
         window.history.go(Number('-' + delta));
-        return 
+        return
     }
 	//#endif
 	//#ifndef H5
@@ -224,13 +190,13 @@ export function fillStr (target: string | number, fill: string, len: number): st
 }
 
 // en 11.2w  ,  sp  11,000.00 ,
-// 
+//
 /**
  * @desc 转换数字格式 11000 -> 11K(en) -> 1万1(cn) -> 11,000(sp)
  * @param num { number } 目标数字
  * @param type { "en" | "cn" | "sp" } 目标数字
  * @param fixed { number } 小数部分长度
- * @return: 
+ * @return:
  */
 export const converNumber = (num: number | string, type: "en" | "cn" | "sp", fixed = 1): string => {
 	num = "" + num;
@@ -304,7 +270,7 @@ export const firstCharCase = (str: string) => str.slice(0, 1).toUpperCase() + st
  * @desc 从数组中找到目标，并插入到数组最前方
  * @param arr 目标数组 { T[] }
  * @param target 查找对象 { T[] }
- * @param options 扩展 
+ * @param options 扩展
  * @param options.key 如果是对象，需要提供唯一 key { keyof T }
  * @param options.type push | unshift { push | unshift }
  * @return: { T[] }
@@ -327,7 +293,7 @@ export function findTargetAndRemove <T> (
         const _target = arr.splice(index, 1);
         arr[type](Object.keys(target as KeyValue<any>).length == 1 ? (_target as T) : target);
     }
-	
+
 	return arr;
 }
 
@@ -335,14 +301,14 @@ export function findTargetAndRemove <T> (
 // Promise.all
 function handlerPromise <T, E = null> (promiseList: Promise<T | E>[]): Promise<T | E>[] {
 	return promiseList.map(
-        (promise: Promise<T | E>) => 
+        (promise: Promise<T | E>) =>
         promise.then((res: T | E) => res, (err: E) => err)
     );
 };
 /**
  * @desc Promise.all 解决ALl catch 中断
  * @param param { type }
- * @return: 
+ * @return:
  */
 export function allSettled <T, E> (promiseList: Promise<T | E>[]): Promise<(Awaited<T> | Awaited<E>)[]> {
 	return Promise.all(handlerPromise(promiseList));
@@ -352,12 +318,12 @@ export function allSettled <T, E> (promiseList: Promise<T | E>[]): Promise<(Awai
  * @desc 防抖, 一定时间范围被只执行最后一次
  * @param func { Function }
  * @param time { number } ms
- * @return: 
+ * @return:
  */
 export function debounce(func: Function, time: number, immediate?: boolean): Function {
 	if (!time || time <= 0) return func;
 	let timeId: any = undefined;
-    
+
 	return function() {
 		if(timeId) clearTimeout(timeId);
         if(immediate) {
@@ -383,7 +349,7 @@ export function debounce(func: Function, time: number, immediate?: boolean): Fun
  * @desc 节流, 一定范围内只执行第一次
  * @param func { Function }
  * @param time { number } ms
- * @return: 
+ * @return:
  */
 export function throttle(func: Function, time: number) {
 	let timeId: any = undefined,
@@ -423,9 +389,9 @@ export type CopyOptionsType = {
  */
 export function copyValue (val: string, options?: CopyOptionsType) {
     const { tip, success, fail } = options || {};
-    // #ifdef H5 
+    // #ifdef H5
     // @ts-ignore
-    if(document && window && window.getSelection){
+    if(typeof document !== "undefined" && window && window.getSelection){
         let platform = ''
         if( isSafari() || isIpad() || isIphone() || isIpod() ) platform = 'ios';
         try {
@@ -457,7 +423,7 @@ export function copyValue (val: string, options?: CopyOptionsType) {
                 _input.select()
                 document.execCommand('Copy')
                 _input.remove()
-            } 
+            }
             tip && toast(tip);
             success && success();
         } catch (error) {  }
@@ -466,7 +432,7 @@ export function copyValue (val: string, options?: CopyOptionsType) {
 	// #endif
 	// #ifndef H5
 	try{
-		uni && uni.setClipboardData && uni.setClipboardData({
+		sdk && sdk.setClipboardData && sdk.setClipboardData({
 			data: val,
 			success: () => {
 		        tip && toast(tip);
@@ -485,3 +451,45 @@ export function hasKey (obj: { [propName: string] : any }, key: string) {
     return Object.prototype.hasOwnProperty.call(obj, key)
 }
 
+
+
+
+// 设置页面title
+export const setTitleName = (title = "") => {
+	if(typeof window !== "undefined" && typeof document !== "undefined") {
+		try {
+			// 链接中的title是base64编码的需要先进行解码
+			let url = getPageUrl()
+			if (url.indexOf("base64=1") > -1) {
+				title = decodeURIComponent(base64decode(title));
+			}
+		} catch (e) {
+			title = "";
+		}
+		const env = getEnv()
+		// 支付宝小程序内部的title 用网页修改title方式设置
+		if (ENV_TYPE.MY === env) {
+			document.title = title
+			return
+		}
+		else if (ENV_TYPE.ALIPAY === env) {
+			const setAlipayTitle = () => {
+				// @ts-ignore
+				AlipayJSBridge.call("setTitle", { title: title });
+			}
+			// @ts-ignore
+			if (window.AlipayJSBridge && AlipayJSBridge) {
+				setAlipayTitle()
+			} else {
+				document.addEventListener('AlipayJSBridgeReady', setAlipayTitle, false)
+			}
+			return
+		}
+	}
+	sdk && sdk.setNavigationBarTitle({
+		title: title,
+		fail: () => {
+			if(typeof document !== "undefined") document.title = title;
+		}
+	})
+}

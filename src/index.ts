@@ -1,3 +1,5 @@
+export * from "./utils/config";
+export * from "./utils/env";
 export * from "./utils/is";
 export * from "./utils/get";
 export * from "./utils/set";
@@ -10,3 +12,4 @@ export * from "./utils/cache";
 export * from "./utils/image";
 export * from "./utils/url";
 export * from "./utils/log";
+export * from "./utils/font";

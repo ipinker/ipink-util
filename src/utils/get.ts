@@ -8,19 +8,16 @@ export interface KeyValue<T> {
  * @desc 获取页面的url
  * @return: { currentPageLong: string, currentPage: string }
  */
-export const getPageUrl = (): { currentPageLong?: string, currentPage?: string } => {
+export const getPageUrl = (): string => {
 	// 仅出现在 H5 平台下的代码
 	// #ifdef H5
     if(typeof window !== "undefined" && window && window.location){
-    	return {
-            currentPageLong: window.location.href,
-            currentPage: window.location.href
-        };
+    	return window.location.href;
     }
 	// #endif
 	// 除了 H5 平台，其它平台均存在的代码
 	// #ifndef H5
-    if(!getCurrentPages) return {};
+    if(typeof getCurrentPages !== "function") return "";
 	// 除了 H5 平台，其它平台均存在的代码
 	var pages = getCurrentPages(); //获取加载的页面
 	var currentPage: any = pages[pages.length - 1]; //获取当前页面的对象
@@ -33,20 +30,14 @@ export const getPageUrl = (): { currentPageLong?: string, currentPage?: string }
 		currentPage += key + '=' + value + '&';
 	}
 	currentPage = currentPage.substring(0, currentPage.length - 1);
-	//得到的值为当前页面及页面地址链接的参数 示例：  outpatientService/yuyue/index?outPatientNumber=111
-	let _currentPage = '/' + currentPage
-	let currentPageLong = '/' + currentPage; //当前页面的全链接
-	return {
-		currentPageLong,
-		currentPage: _currentPage
-	};
+	return '/' + currentPage;
 	// #endif
 }
 
 /**
  * @desc 根据出生日期判断年龄
  * @param birthStr { string }
- * @return: 
+ * @return:
  */
 export function getAgeByBirth (birthDate: string): number {
 	const r: RegExpMatchArray | null = birthDate.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/);
@@ -63,7 +54,7 @@ export function getAgeByBirth (birthDate: string): number {
 /**
  * @desc 根据出生日期计算出生了几天;
  * @param birthStr { string }
- * @return: 
+ * @return:
  */
 export function getBirthDays (birthDate: string): number {
 	let now: number = Date.now(); //现在的时间
@@ -93,7 +84,7 @@ export function getBirthByID (idCard: string): string {
 /**
  * @desc 将目标转化为JSON string => JSON | JSON -> JSON
  * @param JSONstring { any }
- * @return: 
+ * @return:
  */
 export function getJson (target: any) {
 	let json: { [ propName : string ] : any } = {};
@@ -109,7 +100,7 @@ export function getJson (target: any) {
  * @desc 获取一个json字符串中的某个成员的值
  * @param JSONstring { string }
  * @param key { string }
- * @return: 
+ * @return:
  */
 export function getJsonMember (target: string, key: string) {
 	let json: { [ propName : string ] : any } = getJson(target);
@@ -120,7 +111,7 @@ export function getJsonMember (target: string, key: string) {
  * @desc 根据身份证获取地区、出生年月、性别
  * @param sId { string } 身份证
  * @param type { 0： 地区 | 1： 生日 | 2： 性别 }
- * @return: 
+ * @return:
  */
 export function getIdCardInfo(sId: string, type: 0 | 1 | 2): string {
 	if (sId.length == 15) {
@@ -194,7 +185,7 @@ export function getIdCardInfo(sId: string, type: 0 | 1 | 2): string {
  * @desc 获取Canvas上下文（用于uniapp）
  * @param id { string } canvas 的 id
  * @param ctx { this } 页面的实例，v2: this, v3: getCurrentInstance()
- * @return: 
+ * @return:
  */
 export const getCanvas = (id: string, ctx: any): Promise<any> => {
 	try{
@@ -227,7 +218,7 @@ export const getCanvas = (id: string, ctx: any): Promise<any> => {
  * @desc 获取字符串的大小
  * @param str { string }
  * @param key { mb | kb | gb } 单位
- * @return: 
+ * @return:
  */
 export const getStringSize = (str: string, key?: "mb" | "kb" | "gb") => {
     // 使用UTF-8编码计算字符串的字节长度
@@ -240,7 +231,7 @@ export const getStringSize = (str: string, key?: "mb" | "kb" | "gb") => {
 	const map = {
         gb,
 		mb,
-		kb 
+		kb
 	};
 	return key ? map[key] : map;
 }
@@ -248,7 +239,7 @@ export const getStringSize = (str: string, key?: "mb" | "kb" | "gb") => {
 /**
  * @desc 给一个颜色的加透明度
  * @param param { type }
- * @return: 
+ * @return:
  */
 export const getOpacityColor = (color: string, opacity: number) => {
     const colorInfo: TinyColor= new TinyColor(color);

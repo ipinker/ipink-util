@@ -1,4 +1,4 @@
-import { toast } from "./util"
+import { toast } from "./toast"
 
 export type ErrorType = {
     errCode?: string | number
@@ -111,7 +111,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
 		sourceType = 1,
 		fileType= "image",
 		extension,
-        
+
 	} = params || {};
 	return new Promise(async (resolve) => {
 		extension = extension || ["png", "PNG", "JPG", "jpg", "jpeg"];
@@ -170,7 +170,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
 				success: (chooseImageRes: UniApp.ChooseImageSuccessCallbackResult) => {
 					let apFilePath: string[] = chooseImageRes.tempFilePaths as string[];
                     try {
-                        if(typeof apFilePath == "string") apFilePath = JSON.parse(apFilePath);   
+                        if(typeof apFilePath == "string") apFilePath = JSON.parse(apFilePath);
                     } catch (error) {
                         apFilePath = []
                     }
@@ -206,10 +206,10 @@ export function getImageInfo (url: string): Promise<UniApp.GetImageInfoSuccessDa
     })
 }
 
-type CanvasElement = { 
-    width: number 
+type CanvasElement = {
+    width: number
     height: number
-    getContext: (id?: string) => UniApp.CanvasContext 
+    getContext: (id?: string) => UniApp.CanvasContext
     toDataURL: (id?: string) => string
 }
 type Path2Base64Result = {
@@ -219,9 +219,9 @@ type Path2Base64Result = {
     err?: ErrorType
 }
 /**
- * @desc 文件路径转换base64 
- * @param path { string } 
- * @param info { string } 
+ * @desc 文件路径转换base64
+ * @param path { string }
+ * @param info { string }
  * @param path { string }
  * @return: { Promise<string[]> }
  */
@@ -236,7 +236,7 @@ export async function pathToBase64 (
 			image.src = path;
 			image.onload = await
 			function() {
-				var canvas: CanvasElement = document.createElement('CANVAS') as unknown as CanvasElement; 
+				var canvas: CanvasElement = document.createElement('CANVAS') as unknown as CanvasElement;
 				var context = canvas.getContext('2d');
 				canvas.height = image.height;
 				canvas.width = image.width;
@@ -248,7 +248,7 @@ export async function pathToBase64 (
 						base64: dataURL,
 						file: path
 					});
-				} catch (e) {				
+				} catch (e) {
                     canvas = null as unknown as CanvasElement;
 					return resolve({
 						base64: "",
@@ -359,7 +359,7 @@ export async function pathToBase64 (
             // @ts-ignore
             if(my && my.createCanvasContext){
                 // #ifdef MP-ALIPAY
-                // 支付宝小程序端兼容, 需要在页面根组件内添加 以下代码   (750rpx) 这里仅提供一个方法, 
+                // 支付宝小程序端兼容, 需要在页面根组件内添加 以下代码   (750rpx) 这里仅提供一个方法,
                 // <view style="position: fixed; top: 0; right: 0; height: 380px; background-color: pink;  left: 0; z-index: -1;"><canvas :style="{width: info.width, height: info.height}" id="canvas"></canvas></view>
                 const ctx: any = my.createCanvasContext('canvas');
                 if (info && info.width) {
@@ -406,7 +406,7 @@ export async function pathToBase64 (
 /**
  * @desc Basr64 转换为 path
  * @param param { type }
- * @return: 
+ * @return:
  */
 export function base64ToPath(base64: string): Promise<string | ErrorType> {
 	return new Promise(function(resolve, reject) {
@@ -423,7 +423,7 @@ export function base64ToPath(base64: string): Promise<string | ErrorType> {
 				type: type
 			})))
 		}
-		var _extName: string[] = base64.split(',')[0].match(/data\:\S+\/(\S+);/) as string[], 
+		var _extName: string[] = base64.split(',')[0].match(/data\:\S+\/(\S+);/) as string[],
             extName = "";
 		if (_extName) {
 			extName = _extName[1] as string
@@ -436,7 +436,7 @@ export function base64ToPath(base64: string): Promise<string | ErrorType> {
 			var dirPath = 'uniapp_temp'
 			var filePath = basePath + '/' + dirPath + '/' + fileName
 			if (!biggerThan(
-                plus.os.name === 'Android' ? '1.9.9.80627' : '1.9.9.80472', 
+                plus.os.name === 'Android' ? '1.9.9.80627' : '1.9.9.80472',
                 plus.runtime.innerVersion as string)
             ) {
 				plus.io.resolveLocalFileSystemURL(basePath, function(entry) {
@@ -527,22 +527,22 @@ export function chooseVideo(options?: ChooseVideoOptions): Promise<string[]> {
 	})
 }
 type ChooseFileOptions = {
-    count: number 
+    count: number
     extension: string[]
-    type: any, 
+    type: any,
     sourceType: 1 | 2 | 3
 }
 /**
  * @desc 选择视频
  * @param param { type }
- * @return: 
+ * @return:
  */
 export function chooseOtherFile(options?: ChooseFileOptions) {
     let { count = 1, extension, type = "all", sourceType } = options || {};
 	extension = extension || ['.csv', '.xlsx']
 	return new Promise((resolve) => {
 		const params = {
-			count, 
+			count,
 			type,
 			sourceType: sourceType == 2 ? ["album"] : sourceType == 3 ? ["camera"] : ["album", "camera"],
 			extension: extension,
@@ -558,7 +558,7 @@ export function chooseOtherFile(options?: ChooseFileOptions) {
                 success (res: WechatMiniprogram.ChooseMessageFileSuccessCallbackResult) {
                     resolve(
                         // @ts-ignore
-                        (res && res.tempFilePaths) || 
+                        (res && res.tempFilePaths) ||
                         (res && res.tempFiles && res.tempFiles[0] ? [res.tempFiles[0].path] : [])
                     )
                 }

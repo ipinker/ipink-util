@@ -1,3 +1,4 @@
+import {Config, sdk, win} from "./config";
 
 export interface CacheValue {
     value?: any
@@ -28,6 +29,7 @@ export class Cache {
 		this.#id = id || "";
 	}
 
+
     /**
      * @desc 设置缓存
      * @param key 存储Key { string }
@@ -44,7 +46,11 @@ export class Cache {
 				createTime: Date.now()
 			}
             // @ts-ignore
-			isUni ? uni.setStorageSync(key, JSON.stringify(cacheValue)) : window.localStorage.setItem(key, JSON.stringify(cacheValue));
+			sdk ?
+				sdk!.setStorageSync(key, JSON.stringify(cacheValue)) :
+				win ?
+					win!.localStorage.setItem(key, JSON.stringify(cacheValue)) :
+					new Error("uni or window is not undefined !")
 		}catch(e){
 			console.log("Cache.set.error: " + e);
 			return false;
@@ -60,15 +66,13 @@ export class Cache {
 	get(key: string): any {
 		try{
 			key = this.genKey(key);
-            let cacheValue: CacheValue;
-            if(isUni) {
-                // @ts-ignore
-                cacheValue = (uni.getStorageSync(key) || {}) as CacheValue;
-            }
-            else {
-                cacheValue = (window.localStorage.getItem(key) || {}) as CacheValue;
-            }
-            try { cacheValue = JSON.parse(cacheValue as string) } catch (error) { cacheValue = {} }
+            let cacheValue: CacheValue = sdk ? (sdk.getStorageSync(key) || {}) as CacheValue :
+				win ? (win.localStorage.getItem(key) || {}) as CacheValue :
+					new Error("uni or window is not undefined !") as CacheValue
+
+            try {
+				cacheValue = JSON.parse(cacheValue as string)
+			} catch (error) { cacheValue = {} }
 			const {
 				value = null,
 				expire = -1,
@@ -127,11 +131,20 @@ export class Cache {
 		}
 	}
 
+	genID() {
+		return this.#id || Config.appID;
+	}
 	genKey(key: string): string {
-		return (this.#id ? this.#id + "_" : "") + key;
+		const id = this.genID();
+        let cacheKey = key + "_" + Config.LANGUAGE;
+		if (id) cacheKey = key + "_" + id + "_" + Config.LANGUAGE;
+		return cacheKey;
 	}
 
 }
 
 /** @desc 单例模式 （id: string） **/
 export const CacheInstance = Cache.createInstance
+
+/** @desc 单例模式 （id: string） **/
+export const Storage = Cache.createInstance()
