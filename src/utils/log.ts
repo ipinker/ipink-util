@@ -28,6 +28,7 @@ interface PrintOption {
 	block ?: boolean
 }
 interface ILogConfig {
+	instance : ILog | null
 	/**
 	 * 配置五种打印的配色
 	 */
@@ -181,6 +182,7 @@ export class Log implements ILog {
 	static getInstance(options ?: ILogConfig) : ILog {
 		// 未获取到实例则重新创建;
 		if (!Log.instance) {
+			// @ts-ignore
 			Log.instance = new Log(options)
 		}
 		// 获取到实例则初始化options, 保持配置最新
@@ -208,7 +210,7 @@ export class Log implements ILog {
 	}
 	hasTitle : boolean = false;
 	useBlock : boolean = false;
-	wlog = window.console || { log: () => undefined };
+	wlog = (typeof window !== "undefined" && window.console ? window.console : typeof console != "undefined" ? console : { log: () => undefined }) as Console;
 	constructor(options ?: ILogConfig) {
 		this.setOption(options);
 	}
@@ -258,13 +260,13 @@ export class Log implements ILog {
 	printTitle : string = "";
 	title(title ?: string) {
 		this.printTitle = title || "";
-		return this;
+		return this as unknown as ILog;
 	}
 
 	extMessage : string = "";
 	ext(extMessage ?: string) {
 		this.extMessage = extMessage || "";
-		return this;
+		return this as unknown as ILog;
 	}
 	/**
 	 * 打印函数
@@ -327,7 +329,7 @@ export class Log implements ILog {
 	useOnceBlock = false;
 	block() {
 		this.useOnceBlock = true;
-		return this;
+		return this as unknown as ILog;
 	}
 
 	group(groupName = "Group ", opt : Function | any[] | any, isClosed ?: boolean, type ?: "primary" | "info" | "success" | "error" | "warning") {
@@ -350,7 +352,7 @@ export class Log implements ILog {
 			this[type](opt)
 		}
 		this.wlog.groupEnd()
-		return this
+		return this as unknown as ILog;
 	}
 
 }
