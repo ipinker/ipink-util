@@ -1,9 +1,32 @@
-import { isArray, isNumber, isObject, isString, isSafari, isIpad, isIphone, isIpod } from "./is";
+import {
+	isArray,
+	isNumber,
+	isObject,
+	isString,
+	isSafari,
+	isIpad,
+	isIphone,
+	isIpod,
+	isToday,
+	isMini,
+	isAndroid
+} from "./is";
 import {getPageUrl, KeyValue} from './get';
-import {ENV_TYPE, getEnv} from "./env";
-import {sdk} from "./config";
+import {ENV_TYPE, getEnv, isMiniProgram} from "./env";
+import {sdk, win} from "./config";
 import {toast} from "./toast";
+import {Storage} from "./cache"
 
+
+export interface IErrorBase {
+	errMsg?: string,
+	errCode?: string
+}
+
+export interface ISuccessBase extends IErrorBase {
+	ok: boolean,
+	msg?: string
+}
 
 const base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const base64DecodeChars = new Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -
@@ -112,14 +135,16 @@ export function base64decode (str: string): string {
 export function navigateBack(delta?: number) {
     delta = delta || 1;
     //#ifdef H5
-    if(window && window.history){
+    if(typeof window !== "undefined" && window.history){
         window.history.go(Number('-' + delta));
         return
     }
 	//#endif
 	//#ifndef H5
 	try{
-		uni && uni.navigateBack && uni.navigateBack({ delta: delta });
+		if(sdk){
+			sdk.navigateBack && sdk.navigateBack({ delta: delta });
+		}
 	}catch(e){
 	}
 	//#endif
@@ -426,7 +451,9 @@ export function copyValue (val: string, options?: CopyOptionsType) {
             }
             tip && toast(tip);
             success && success();
-        } catch (error) {  }
+        } catch (error: any) {
+			fail && fail(error)
+		}
         return;
     }
 	// #endif
@@ -438,10 +465,10 @@ export function copyValue (val: string, options?: CopyOptionsType) {
 		        tip && toast(tip);
 		        success && success();
 		    },
-			fail: () => fail && fail()
+			fail: (e: any) => fail && fail(e)
 		});
-	}catch(e){
-		//TODO handle the exception
+	}catch(e: any){
+		fail && fail(e)
 	}
 	// #endif
 }
@@ -493,3 +520,707 @@ export const setTitleName = (title = "") => {
 		}
 	})
 }
+/**
+ * 字符脱敏
+ * @param str
+ * @param begin 从第几位开始
+ * @param end   倒数从第几位结束
+ */
+const desensitization = (str: string, begin = 3, end = begin) => {
+	if (!str || str.length <= begin + end) return str;
+    end = str.length - end
+	let firstStr = str.slice(0, begin);
+	let lastStr = str.slice(end);
+	let middleStr = str.substring(begin, Math.abs(end)).replace(/[\s\S]/ig, '*');
+	let tempStr = firstStr + middleStr + lastStr;
+	return tempStr;
+}
+
+interface IGetRefInfoOption {
+	size?: boolean,
+	rect?: boolean,
+	scrollOffset?: boolean
+}
+/***
+ * 在UniApp中 获取元素的布局信息
+ * @param {*} ref :  #id .class tag
+ * @return {*} that : this
+ * @return { IGetRefInfoOption } options
+ */
+export const getRefInfo = (ref: string, that: any, options?: IGetRefInfoOption) => {
+	if (!options) {
+		options = {
+			size: true,
+			rect: true,
+			scrollOffset: true
+		}
+	}
+	if(!sdk) return Promise.resolve(null);
+	return new Promise((resolve) => {
+		if (!ref) {
+			resolve(null);
+		}
+		try {
+			let view = uni.createSelectorQuery().in(that).select(ref);
+			view.fields(options, data => {
+				resolve(data ? {
+					...data,
+					ref
+				} : null);
+			}).exec();
+		} catch (e) {
+			resolve(null);
+		}
+	});
+}
+
+interface IGetLocationOption {
+	success?: Function,
+	fail?: Function,
+	complete?: Function,
+	/**  @deprecated 已废弃  **/
+	callback?: Function,
+	isToast?: boolean,
+	/**
+	 * 使用后今日不再掉用成功
+	 */
+	isUseRefuseTime?: boolean,
+	/**
+	 * 初始化WxJsSdk的函数， 可以将初始化微信jssdk的逻辑写在该函数内
+	 */
+	initWxSdkCallback?: () => Promise<any>
+}
+/**
+ * 获取经纬度
+ * @param { IGetLocationOption } options
+ */
+export const getLocation = async (options: IGetLocationOption) => {
+	const {
+		callback,
+		success,
+		fail,
+		complete,
+		isToast = false,
+		isUseRefuseTime = false,
+		initWxSdkCallback
+	} = options || {}
+	return new Promise(async (resolve) => {
+		if (isUseRefuseTime) {
+			const refuseTime = Storage.getItem('IsRefuseGetLocation')
+			if (refuseTime && isToday(refuseTime)) {
+				callback && callback(false, {})
+				return resolve(null)
+			}
+		}
+
+		let isAlipay = false,
+			err: any = null
+		// #ifdef H5
+		if(typeof document !== 'undefined' && win) {
+			try {
+				let env = getEnv()
+				if (env == ENV_TYPE.ALIPAY || env == ENV_TYPE.MY) {
+					isAlipay = true
+					// @ts-ignore
+					window.AlipayJSBridge && AlipayJSBridge.call('getCurrentLocation', {bizType: '$s'}, (result: any) => {
+						if (result.error) {
+							callback && callback()
+							if (result.error == 11) {
+								// @ts-ignore
+								AlipayJSBridge.call('showAuthGuide', {bizType: '$s', authType: 'LBS'}, function(r: any) {
+									fail && fail({
+										... result,
+										errMsg: result.errorMessage
+									})
+								});
+							} else {
+								fail && fail({
+									... result,
+									errMsg: result.errorMessage
+								})
+								toast(result.errorMessage);
+							}
+							complete && complete()
+							resolve(null)
+						}
+						else {
+							callback && callback(result)
+							success && success(result)
+							complete && complete(result)
+							resolve(result)
+						}
+					});
+
+					return ;
+				}
+				else if (env == ENV_TYPE.WX || env == ENV_TYPE.WXMINI) {
+					// 是否需要初始化微信sdk
+					if (initWxSdkCallback) {
+						await initWxSdkCallback()
+					}
+					wx.getLocation({
+						// 默认为wgs84的 gps 坐标，如果要返回直接给 openLocation 用的火星坐标，可传入'gcj02'
+						type: 'gcj02',
+						success: (res) => {
+							callback && callback(res)
+							success && success(res)
+							complete && complete(res)
+							resolve(res)
+						},
+						fail: (e) => {
+							callback && callback()
+							fail && fail(e)
+							complete && complete()
+							resolve(null)
+						},
+						cancel: function(res: any) {
+							callback && callback()
+							fail && fail({
+								errMsg: res.errMsg || "用户拒绝授权获取地理位置信息"
+							})
+							complete && complete()
+							resolve(null)
+							if (isUseRefuseTime) {
+								// 使用微信内置的提示框
+								const result = confirm('用户拒绝授权获取地理位置，今日是否不再提示!');
+								if (result) {
+									Storage.setItem('IsRefuseGetLocation', new Date())
+								}
+							}
+						}
+					});
+					return
+				}
+				// @ts-ignore
+				else if (env == ENV_TYPE.SWAN && typeof swan !== "undefined" && swan.getLocation) {
+					// @ts-ignore
+					swan.getLocation({
+						type: 'gcj02',
+						success: (res: any) => {
+							callback && callback(res)
+							success && success(res)
+							complete && complete(res)
+							resolve(res)
+						},
+						fail: (err: any) => {
+							callback && callback()
+							fail && fail(err)
+							complete && complete()
+							resolve(null)
+						}
+					});
+					return ;
+				}
+			} catch (e: any) {
+				err = {
+					... (e || {}),
+					errMsg: e?.errMsg || e?.message || "获取失败"
+				}
+			}
+		}
+		// #endif
+
+		try {
+			if(sdk){
+				// 默认为 wgs84 返回 gps 坐标，gcj02 返回国测局坐标
+				let type = 'gcj02'
+				// #ifdef H5
+				type = typeof document !== "undefined" && isAlipay ? 'wgs84' : 'gcj02'
+				// #endif
+				// #ifdef MP
+				if(isMini()) type = 'wgs84'
+				// #endif
+				uni.getLocation({
+					type,
+					highAccuracyExpireTime: 1000,
+					success: (res) => {
+						callback && callback(res);
+						success && success(res);
+						complete && complete(res)
+						resolve(res)
+					},
+					fail: (err) => {
+						callback && callback();
+						fail && fail(err)
+						complete && complete()
+						resolve(null)
+					}
+				});
+				return ;
+			}
+		} catch (e: any) {
+			err = {
+				... (e || {}),
+				errMsg: e?.errMsg || e?.message || "获取失败"
+			}
+		}
+		callback && callback();
+		fail && fail({
+			... (err || {}),
+			errMsg: err?.errMsg || "获取失败"
+		})
+		complete && complete()
+		resolve(null)
+	})
+}
+
+
+let EARTH_RADIUS = 6378137.0; //单位M
+let PI = Math.PI;
+function getRad(d: number): number {
+	return d * PI / 180.0;
+}
+/**
+ * 计算两个坐标之间的距离, 单位 米（m）
+ * @param {number} lng1 坐标经度1
+ * @param {number} lat1 坐标纬度1
+ * @param {number} lng2 坐标经度2
+ * @param {number} lat2 坐标纬度2
+ * @example `
+ * 	const result = getGreatCircleDistance(116.2317, 39.5427, 116.1127, 38.1456)
+ * 	console.log(result) //155866.2671
+ * `
+ *
+ */
+export function getGreatCircleDistance(lng1: number, lat1: number, lng2: number, lat2: number): number {
+	let radLat1 = getRad(lat1);
+	let radLat2 = getRad(lat2);
+	let a = radLat1 - radLat2;
+	let b = getRad(lng1) - getRad(lng2);
+	let s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
+	s = s * EARTH_RADIUS;
+	s = Math.round(s * 10000) / 10000.0;
+	return s;
+}
+
+interface IPostMessageOption {
+	/**
+	 * 自己定义的通信时间标识
+	 */
+	type: string,
+	/**
+	 * 通信传递参数
+	 */
+	params: AnyObject,
+	success: (data: IPostMessageResult) => void,
+	fail: (err: IErrorBase) => void,
+	complete: (data: IPostMessageResult | IErrorBase) => void,
+}
+
+interface IPostMessageResult extends ISuccessBase {
+}
+/**
+ * @desc h5 与 父级应用通信
+ * @param { Object } options
+ * params.type 事件类型
+ * params.success
+ * params.fail
+ * params.options Data
+ */
+export function postMessage(options : IPostMessageOption): Promise<IPostMessageResult | IErrorBase> {
+	const env = getEnv();
+	return new Promise((resolve) => {
+		if(typeof document !== 'undefined' && win) {
+			try {
+				const {
+					type,
+					params = {},
+					success,
+					fail
+				} = options || {}
+				//  消息内容
+				const msgData = {
+					data: {
+						type: type,
+						params
+					}
+				}
+				// 消息回调
+				const callBack = () => {
+					resolve({
+						ok: true
+					})
+					success({
+						ok: true
+					})
+				}
+				switch (env) {
+					case ENV_TYPE.MY:
+
+						// @ts-ignore
+						my.postMessage({
+							type: type,
+							params
+						});
+						// @ts-ignore
+						my.onMessage = (e) => {
+							const {
+								ok,
+								result,
+								type
+							} = e
+							if (ok) {
+								if (typeof success == 'function') {
+									success(e)
+								}
+								resolve(e)
+							} else {
+								if (typeof fail == 'function') {
+									fail(e)
+								}
+								resolve({
+									... (e || {}),
+									errMsg: e?.errMsg || e?.message || "获取信息失败"
+								})
+							}
+						}
+						break;
+					case ENV_TYPE.WX:
+					case ENV_TYPE.WXMINI:
+						// @ts-ignore
+						wx.miniProgram.postMessage(msgData)
+						// 微信小程序webview中无法直接通信  直接回调成功
+						callBack()
+						break;
+					case ENV_TYPE.SWAN:
+						// @ts-ignore
+						swan.webView.postMessage(msgData)
+						// 百度小程序webview中无法直接通信  直接回调成功
+						callBack()
+						break
+					case ENV_TYPE.TT:
+						// @ts-ignore
+						tt.miniProgram.postMessage(msgData)
+						// 抖音小程序webview中无法直接通信  直接回调成功
+						callBack()
+						break
+					default:
+						window.postMessage(msgData)
+						callBack()
+						break;
+				}
+
+			} catch (e) {
+				resolve({
+					ok: false,
+					... (e || {})
+				})
+			}
+		}
+		else {
+			resolve({
+				ok: true,
+				errMsg: "非浏览器环境调用"
+			})
+		}
+	})
+}
+/**
+ * webview内返回主应用首页
+ * @param delta { number }
+ */
+export const backMainAppHome = (delta = 1) => {
+	// #ifdef H5
+	if(typeof document !== 'undefined' && win) {
+		const env = getEnv()
+		if (ENV_TYPE.WXMINI === env && typeof wx !== "undefined") {
+			// @ts-ignore
+			wx.miniProgram.navigateBack({
+				delta
+			});
+			return true;
+		}
+		else if (ENV_TYPE.MY === env && typeof my !== "undefined") {
+			// @ts-ignore
+			my.navigateBack({
+				delta
+			});
+			return true;
+		}
+		// @ts-ignore
+		else if (ENV_TYPE.SWAN === env && typeof swan !== "undefined") {
+			// @ts-ignore
+			swan.webView.navigateBack({
+				delta
+			});
+			return true;
+		}
+		// @ts-ignore
+		else if (sdk && sdk?.webView?.navigateBack) {
+			// @ts-ignore
+			sdk.webView.navigateBack({
+				delta
+			});
+			return true;
+		}
+		// #endif
+		uni.navigateBack({
+			delta: delta
+		});
+	}
+	return true;
+}
+
+
+/**
+ * uniapp 检查白屏
+ * @param nextTick { Vue.nextTick }
+ * @param ref
+ * @example `
+ *  const ctx = getCurrentInstance()?.proxy
+ * 	checkWhiteScreen(ctx, ".content")
+ *
+ * 	checkWhiteScreen(this, ".content")
+ * `
+ */
+export const checkWhiteScreen = (that: any, ref = ".content") => {
+	try {
+		that.$nextTick(() => {
+			const query = uni.createSelectorQuery().in(that);
+			query.select(ref).boundingClientRect((data: any) => {
+				if (!data || data.height == 0) {
+					window.location.reload();
+				}
+			}).exec();
+		})
+	} catch (e) {}
+}
+
+interface IScanCodeOption {
+	success?: (opt: {code: string}) => void
+
+	/**
+	 * 小程序webview扫码完成调用api指定key为【cacheKey】存储到云端，webview找时机使用【cacheKey】去云端取值
+	 */
+	cacheKey?: string,
+	/**
+	 * 微信公众号该参数比传
+	 */
+	jsCodeInfo?: {
+
+	}
+}
+export const BAR_CODE_TYPE = ["EAN_8", "EAN_13", "CODE_25", "CODE_39", "CODE_128", "UPC_A", "UPC_E"];
+/**
+ * 扫码
+ * @param options
+ */
+export const scanCode = (options: IScanCodeOption) => {
+	const {
+		success,
+		cacheKey,
+		jsCodeInfo = {}
+	} = options || {};
+	const empty = {
+		code: ""
+	}
+	return new Promise(async (resolve) => {
+		try {
+			if (navigator.userAgent.indexOf("AlipayClient") >= 0) {
+				if (isMini()) {
+					// @ts-ignore
+					my.onMessage = (e) => {
+						var result = JSON.parse(e.messageDetail);
+						let opt = {
+							code: result.scanCode
+						};
+						if (success) {
+							success(opt);
+						}
+						resolve(opt);
+					};
+					// @ts-ignore
+					my.postMessage({
+						messageType: "scan",
+					});
+				} else {
+					// @ts-ignore
+					if (window.AlipayJSBridge && AlipayJSBridge) {
+					// @ts-ignore
+						AlipayJSBridge.call(
+							'scan', {
+								scanType: ['qrCode', 'barCode']
+							},
+							(result: any) => {
+								let opt = {
+									code: ""
+								};
+								if (result.barCode) {
+									opt.code = result.barCode;
+								}
+								if (result.qrCode) {
+									opt.code = result.qrCode;
+								}
+								if (success) {
+									success(opt);
+								}
+								resolve(opt);
+							},
+							(err: any) => {
+								toast("识别失败: " + JSON.stringify(err))
+								if (success) {
+									success(empty);
+								}
+								resolve(empty);
+							}
+						);
+					} else {
+						toast("扫码调用失败");
+						if (success) {
+							success(empty);
+						}
+						resolve(empty);
+					}
+				}
+			}
+			else if (navigator.userAgent.indexOf("MicroMessenger") >= 0 && typeof wx !== "undefined") {
+				if (isMiniProgram()) {
+					// @ts-ignore
+					wx.miniProgram.postMessage({
+						data: {
+							type: "scan",
+							params: {
+								cacheKey
+							}
+						}
+					});
+					if (success) {
+						success(empty);
+					}
+					return resolve(empty);
+				}
+				// @ts-ignore
+				wx.config({
+					debug: 0,
+					... (jsCodeInfo || {}),
+					jsApiList: ["scanQRCode"], // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+				});
+				// @ts-ignore
+				wx.ready(() => {
+					// @ts-ignore
+					wx.scanQRCode({
+						needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+						scanType: [
+							"qrCode",
+							"barCode",
+							"datamatrix",
+						], // 可以指定扫二维码还是一维码，默认二者都有
+						success: (result: any) => {
+							let commaIndex = result.resultStr.indexOf(',');
+							try {
+								const target = BAR_CODE_TYPE.find(item => item
+									.toLocaleUpperCase() == result.resultStr
+									.slice(0, commaIndex));
+								if (target) {
+									result.resultStr = result.resultStr.slice(
+										commaIndex + 1);
+								}
+							} catch (e) {}
+							let opt = {
+								code: result.resultStr
+							};
+							if (success) {
+								success(opt);
+							}
+							resolve(opt);
+						},
+						fail: (res: any) => {
+							toast(JSON.stringify(res));
+							if (success) {
+								success(empty);
+							}
+							resolve(empty);
+						}
+					});
+				});
+			}
+			else {
+				uni.scanCode({
+					success: function (res) {
+						let opt = {
+							code: res.result
+						}
+						if (success) {
+							success(opt);
+						}
+						resolve(opt);
+					},
+					fail() {
+						toast("当前环境暂不支持扫码！");
+						if (success) {
+							success(empty);
+						}
+						resolve(empty);
+					}
+				});
+			}
+
+		} catch (e: any) {
+
+			toast(e?.errMsg || e?.message || JSON.stringify(e));
+			if (success) {
+				success(empty);
+			}
+			resolve(empty);
+		}
+	});
+}
+
+/**
+ * 数组扁平化 多维转一维
+ * @param {T[]} arr
+ */
+export function flattenArray<T> (arr: any[]): T[] {
+	let result: T[] = [];
+
+	// 遍历数组中的每一项
+	arr.forEach(item => {
+		if (Array.isArray(item)) {
+			// 如果元素是数组，递归调用 flattenArray 函数
+			result = result.concat(flattenArray(item));
+		} else {
+			// 如果元素是普通元素，直接推入结果数组
+			result.push(item);
+		}
+	});
+
+	return result;
+}
+
+interface IFormatArrResult<T> {
+	children: IFormatArrResult<T>[]
+}
+/**
+ * 将一位数组根据指定的key(例如pid), 进行分组为子父级结构
+ * @param {T[]} arr
+ * @param {String} key = "pid"
+ */
+export function buildHierarchyArray <T extends { id: string | number }>(arr: T[], key : keyof T): IFormatArrResult<T>[] {
+	let result: IFormatArrResult<T>[] = [];
+	let map: { [propName: string]: IFormatArrResult<T> } = {};
+
+	// 创建一个 map，用于存储每个元素，便于后续查找
+	arr.forEach((item: T) => {
+		map[item.id] = {
+			...item,
+			children: []
+		}; // 复制 item 并初始化 children 属性
+	});
+
+	// 遍历数组，构建树形结构
+	arr.forEach((item: T) => {
+		let pid = item[key] as IFormatArrResult<T>;
+		if (pid === null || pid === undefined) {
+			// 如果没有 pid，说明是根节点，直接放入结果数组
+			result.push(map[item.id]);
+		} else {
+			// 否则，将当前元素添加到其父元素的 children 数组中
+			if (pid) {
+				pid.children.push(map[item.id]);
+			}
+		}
+	});
+
+	return result;
+}
+

@@ -1,5 +1,6 @@
 import {Storage} from "./cache";
 import {sdk} from "./config";
+import ShowModalOptions = UniNamespace.ShowModalOptions;
 
 
 export const htmlToast = (content: string, duration = 3000, complete?: Function, mask?: boolean, success?: Function, fail?: Function) => {
@@ -148,4 +149,26 @@ export const toast = (options: IToast | string) => {
 		fail && fail(errMsg);
 		complete && complete(errMsg);
 	}
+}
+
+export const showModal = (options: ShowModalOptions): Promise<boolean> => {
+	return new Promise(resolve =>{
+
+		if(sdk){
+			uni.showModal({
+				... (options || {}),
+				success: (e: any) => {
+					options?.success && options.success(e)
+					resolve(true);
+				},
+				fail: (e: any) => {
+					options?.fail && options.fail(e)
+					resolve(false);
+				}
+			})
+		}
+		else {
+			resolve(true);
+		}
+	});
 }

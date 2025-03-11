@@ -1,5 +1,5 @@
-type EnvKey = "WEB" | "WX" | "ALIPAY" | "WXMINI" | "MY" | "ESHIMIN" | "SWAN" | "KF" | "DY" | "TT" | "APP"
-type EnvVal = "WEB" | "WX" | "ALIPAY" | "WXMINI" | "MY" | "ESHIMIN" | "SWAN" | "GifShow" | "Bytedance" | "TT" | "iApp"
+export type EnvKey = "WEB" | "WX" | "ALIPAY" | "WXMINI" | "MY" | "ESHIMIN" | "SWAN" | "KF" | "DY" | "TT" | "APP"
+export type EnvVal = "WEB" | "WX" | "ALIPAY" | "WXMINI" | "MY" | "ESHIMIN" | "SWAN" | "GifShow" | "Bytedance" | "TT" | "iApp"
 interface IEnvType {
 	[ propName : string ]: EnvVal
 }
@@ -41,7 +41,7 @@ export const isMiniProgram = (): boolean => {
 /**
  * 获取当前浏览器的环境变量
  */
-export function getEnv(): string {
+export function getEnv(): EnvVal {
 	if (/micromessenger/i.test(navigator.userAgent.toLocaleLowerCase())) {
 		if (isMiniProgram()) {
 			return ENV_TYPE.WXMINI;

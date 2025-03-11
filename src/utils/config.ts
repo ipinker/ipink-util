@@ -57,7 +57,7 @@ export class Config {
 }
 
 // @ts-ignore
-export const sdk: Uni = "undefined" != typeof uni ? uni : "undefined" != wx ? wx : "undefined" != my ? my : "undefined" != qq ? qq : null; // uni | wx | qq | my
+export const sdk: Uni = "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : "undefined" != typeof my ? my : "undefined" != typeof qq ? qq : "undefined" != typeof swan ? swan : null; // uni | wx | qq | my
 // @ts-ignore
 export const win: Window = "undefined" != typeof window ? window : "undefined" != this ? this : "undefined" != self ? self : null; // window | self | this
 

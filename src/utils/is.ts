@@ -6,6 +6,7 @@
 
 import { TinyColor } from "@ctrl/tinycolor";
 import {parseDate} from "./date";
+import {sdk} from "./config";
 
 /**** 数据类型判断 ****/
 // 是否为字符串
@@ -111,7 +112,7 @@ export const isExternal = (path: string) => {
     const reg = /^(http?:|https?:|mailto:|tel:)/
     return reg.test(path)
 }
-  
+
 /* --------------------------------end------------------------------------------ */
 
 
@@ -206,7 +207,7 @@ export const isTel = (tel: string, telType: number = 3): boolean => {
 		telType == 2 ? /^0\d{2,3}(-)?\d{7,8}-\d{1,6}$/ :
 		/^0\d{2,3}(-)?\d{7,8}(-\d{1,6})?$/;
 	let P:RegExp = /^1[3,4,5,6,7,8,9]\d{9}$/;
-    
+
 	return telType == 4 ? (T.test(tel) || T2.test(tel) || P.test(tel)) : (T2.test(tel) || T.test(tel));
 };
 export const isZipCode = (code: string) => /^[0-9]\d{5}$/.test(code);
@@ -301,7 +302,7 @@ const isJuLiuCardV1 = (code: string) => {
 		X: 33,
 		Y: 34,
 		Z: 35
-	} as const; 
+	} as const;
     type MapType = keyof (typeof map)
 	// 无限循环 7 3 1 加权因子
 	let wiArr = [7, 3, 1];
@@ -417,7 +418,7 @@ export const isIos = (): boolean => {
     if(userAgent){
         return isIpad() || isIphone() || isIpod()
     }
-    // #endif 
+    // #endif
 	try{
 		const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
 		// 非 H5 ｜ uniapp 平台不支持判断
@@ -437,7 +438,7 @@ export const isAndroid = (): boolean => {
     if(userAgent) {
         return userAgent.indexOf('Android') > -1 || userAgent.indexOf('Adr') > -1;
     }
-    // #endif 
+    // #endif
 	try{
 		const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
 		// 非 H5 ｜ uniapp 平台不支持判断
@@ -455,18 +456,12 @@ export const isAndroid = (): boolean => {
 //是否为小程序环境  h5 | uniapp
 export const isMini = (): boolean => {
 	// #ifdef H5
-	if (
-		navigator && navigator.userAgent &&
-		(
-            navigator.userAgent.indexOf("Mini") > -1 || 
-            navigator.userAgent.indexOf('mini') > -1
-        )
-	) return true;
+	if ( navigator && navigator.userAgent && navigator.userAgent.toLowerCase().indexOf("Mini") > -1) return true;
 	// #endif
 	try{
-		const SystemInfo = uni && uni.getSystemInfoSync && uni.getSystemInfoSync();
+		const SystemInfo = sdk && sdk.getSystemInfoSync && sdk.getSystemInfoSync();
 		// 非 H5 ｜ uniapp 平台不支持判断
-		if(SystemInfo && SystemInfo.uniPlatform && SystemInfo.uniPlatform.startsWith("mp")) return true		
+		if(SystemInfo && SystemInfo.uniPlatform && SystemInfo.uniPlatform.startsWith("mp")) return true
 	}catch(e){
 		//TODO handle the exception
 	}
@@ -509,7 +504,7 @@ export const isOffline = !isOnline();
 /**
  * @desc 判断颜色是否为亮色 ｜ 还是暗色
  * @param param { type }
- * @return: 
+ * @return:
  */
 export const isDarkColor = (color: string) => {
 	const colorInfo = new TinyColor(color);
