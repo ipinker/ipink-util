@@ -1187,17 +1187,16 @@ export function flattenArray<T> (arr: any[]): T[] {
 	return result;
 }
 
-interface IFormatArrResult<T> {
-	children: IFormatArrResult<T>[]
-}
+export type FormatTArray<T> = T & { children: T[] }
 /**
  * 将一位数组根据指定的key(例如pid), 进行分组为子父级结构
+ * 类似函数 formatTree， 如果对id也自定义可以使用 formatTree
  * @param {T[]} arr
  * @param {String} key = "pid"
  */
-export function buildHierarchyArray <T extends { id: string | number }>(arr: T[], key : keyof T): IFormatArrResult<T>[] {
-	let result: IFormatArrResult<T>[] = [];
-	let map: { [propName: string]: IFormatArrResult<T> } = {};
+export function buildHierarchyArray <T extends { id: string | number }>(arr: T[], key : keyof T): FormatTArray<T>[] {
+	let result: FormatTArray<T>[] = [];
+	let map: { [propName: string]: FormatTArray<T> } = {};
 
 	// 创建一个 map，用于存储每个元素，便于后续查找
 	arr.forEach((item: T) => {
@@ -1209,7 +1208,7 @@ export function buildHierarchyArray <T extends { id: string | number }>(arr: T[]
 
 	// 遍历数组，构建树形结构
 	arr.forEach((item: T) => {
-		let pid = item[key] as IFormatArrResult<T>;
+		let pid = item[key] as FormatTArray<T>;
 		if (pid === null || pid === undefined) {
 			// 如果没有 pid，说明是根节点，直接放入结果数组
 			result.push(map[item.id]);
@@ -1222,5 +1221,31 @@ export function buildHierarchyArray <T extends { id: string | number }>(arr: T[]
 	});
 
 	return result;
+}
+
+/**
+ * 格式化二级数据 【1，2】 =》 【【】】
+ * 类似函数 formatTree
+ * @param param { type }
+ * @return:
+ */
+ export function formatTree <T>(nodeList: T[], childKey: string, parentKey: string):  FormatTArray<T>[] {
+    childKey = childKey || "id";
+    parentKey = parentKey || "pid";
+	const map: { [propName : string] : FormatTArray<T> } = {};
+	for (var i = 0; i < nodeList.length; i++) {
+        const item: any = nodeList[i] as T as any;
+        const parentId: string = item[parentKey];
+        const childId: string = item[childKey];
+		if (!parentId) map[childId] = { ... item, children: [] }
+	}
+	for (var i = 0; i < nodeList.length; i++) {
+        const item: any = nodeList[i] as T as any;
+        const parentId: string = item[parentKey];
+		if (item[parentId] && map[parentId] && map[parentId].children) {
+			map[parentId].children.push(nodeList[i]);
+		};
+	}
+	return Object.values(map);
 }
 
