@@ -15,3 +15,4 @@ export * from "./utils/set";
 export * from "./utils/toast";
 export * from "./utils/url";
 export * from "./utils/util";
+export * from "./utils/request";
