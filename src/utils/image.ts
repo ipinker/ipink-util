@@ -76,13 +76,13 @@ function biggerThan(v1: string, v2: string) {
  */
 export type ChooseImageOption = {
     /** @desc 上传数量 **/
-    count: number
+    count?: number
     /** @desc 打开相机方式 1: 相机， 2: 相册， 3:全部 **/
-    sourceType: 1 | 2 | 3
+    sourceType?: 1 | 2 | 3
     /** @desc 固定不变 **/
-    fileType: "image"
+    fileType?: "image" | "video" | "audio",
     /** @desc 文件后缀限制 **/
-    extension: string[]
+    extension?: string[]
 }
 export type ChooseImageAlipayResult = {
     /** @desc 图片文件路径 **/
@@ -140,7 +140,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
 					if(fileType == "image"){
 						let fIndex = (chooseImageRes.tempFiles || []).findIndex(item => {
 							var type = item.type;
-                            const checkType = extension.map(item => "image/" + item).find(item => item == type)
+                            const checkType = (extension || []).map(item => "image/" + item).find(item => item == type)
 							if (type && !checkType) {
 								return item;
 							}
@@ -527,17 +527,17 @@ export function chooseVideo(options?: ChooseVideoOptions): Promise<string[]> {
 	})
 }
 type ChooseFileOptions = {
-    count: number
-    extension: string[]
-    type: any,
-    sourceType: 1 | 2 | 3
+    count?: number
+    extension?: string[]
+    type?: any,
+    sourceType?: 1 | 2 | 3
 }
 /**
  * @desc 选择视频
  * @param param { type }
  * @return:
  */
-export function chooseOtherFile(options?: ChooseFileOptions) {
+export function chooseOtherFile(options?: ChooseFileOptions): Promise<string[]> {
     let { count = 1, extension, type = "all", sourceType } = options || {};
 	extension = extension || ['.csv', '.xlsx']
 	return new Promise((resolve) => {
@@ -572,7 +572,7 @@ export function chooseOtherFile(options?: ChooseFileOptions) {
             uni.chooseFile({
                 ... params,
                 success: function (res) {
-                    resolve(res.tempFilePaths || [])
+                    resolve(res.tempFilePaths ? (typeof res.tempFilePaths == "string" ? [res.tempFilePaths] : res.tempFilePaths)  : [])
                 }
             });
             return ;

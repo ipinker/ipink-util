@@ -44,8 +44,9 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@ctrl/tinycolor": "^4.0.2",
 		"@dcloudio/types": "^3.4.8",
-		"@ctrl/tinycolor": "^4.0.2"
+		"lodash-es": "^4.17.21"
 	},
 	"license": "ISC"
 }

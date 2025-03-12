@@ -1,5 +1,5 @@
 import {Storage} from "./cache";
-import {sdk} from "./config";
+import {Config, sdk} from "./config";
 import ShowModalOptions = UniNamespace.ShowModalOptions;
 
 
@@ -96,7 +96,7 @@ export const htmlToast = (content: string, duration = 3000, complete?: Function,
 	}
 }
 
-interface IToast {
+export interface IToast {
 	/**  @desc 标题  **/
 	title?: string,
 	/**  @desc 图标  **/
@@ -117,7 +117,7 @@ export const toast = (options: IToast | string) => {
 		title = "",
 		icon="none",
 		mask=false,
-		duration=3000,
+		duration = Config.toast_duration,
 		complete,
 		success,
 		fail,
@@ -128,7 +128,7 @@ export const toast = (options: IToast | string) => {
 	}
 	if(!title) return "";
 	// @ts-ignore
-	if(typeof document !== "undefined" && document.createElement) {
+	if(Config.use_inner_toast && typeof document !== "undefined" && document.createElement) {
 		return htmlToast(title, duration, complete, mask, success, fail);
 	}
 	// @ts-ignore

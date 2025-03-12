@@ -1,4 +1,3 @@
-import { TinyColor } from "@ctrl/tinycolor";
 import { isArray, isObject } from "./is";
 import { compareVersion } from "./util";
 export interface KeyValue<T> {
@@ -234,15 +233,4 @@ export const getStringSize = (str: string, key?: "mb" | "kb" | "gb") => {
 		kb
 	};
 	return key ? map[key] : map;
-}
-
-/**
- * @desc 给一个颜色的加透明度
- * @param param { type }
- * @return:
- */
-export const getOpacityColor = (color: string, opacity: number) => {
-    const colorInfo: TinyColor= new TinyColor(color);
-    if(!colorInfo.isValid) return color;
-	return new TinyColor(color).setAlpha(opacity).toRgbString();
 }

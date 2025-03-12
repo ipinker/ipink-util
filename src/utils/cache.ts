@@ -1,9 +1,19 @@
 import {Config, sdk, win} from "./config";
 
-export interface CacheValue {
+interface CacheValue {
     value?: any
     expire?: number
     createTime?: number
+}
+export declare interface IStorage {
+	set: (key: string, value: any, expire?: number | -1)=> boolean
+	setItem: (key: string, value: any, expire?: number | -1)=> boolean
+	get: (key: string) => any
+	getItem: (key: string) => any
+	remove: (key: string)=> boolean
+	clear: () => void
+	genKey: (key: string) => string
+	setConfig: (option: { id?: string }) => void
 }
 const isUni = (() => {
 	try{
@@ -14,7 +24,7 @@ const isUni = (() => {
 	}
 })();
 
-export class Cache {
+export class Cache implements IStorage {
 	static #instance: Cache | null = null;
 	#id = "";
 
@@ -29,6 +39,11 @@ export class Cache {
 		this.#id = id || "";
 	}
 
+	setConfig(option: { id?: string }) {
+		if(option.id){
+			this.#id = option.id;
+		}
+	}
 
     /**
      * @desc 设置缓存
@@ -132,19 +147,16 @@ export class Cache {
 	}
 
 	genID() {
-		return this.#id || Config.appID;
+		return this.#id || Config.appId;
 	}
 	genKey(key: string): string {
 		const id = this.genID();
-        let cacheKey = key + "_" + Config.LANGUAGE;
-		if (id) cacheKey = key + "_" + id + "_" + Config.LANGUAGE;
+        let cacheKey = key + "_" + Config.language;
+		if (id) cacheKey = key + "_" + id + "_" + Config.language;
 		return cacheKey;
 	}
 
 }
 
-/** @desc 单例模式 （id: string） **/
-export const CacheInstance = Cache.createInstance
-
-/** @desc 单例模式 （id: string） **/
-export const Storage = Cache.createInstance()
+/** @desc 单例模式 **/
+export const Storage = Cache.createInstance() as IStorage

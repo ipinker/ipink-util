@@ -22,7 +22,7 @@ export default defineConfig({
                 // 打包自动删除console
                 drop_console: false,
                 drop_debugger: true,
-				keep_fnames: true, 
+				keep_fnames: true,
             },
             keep_classnames: true,
 			mangle: {
@@ -33,7 +33,9 @@ export default defineConfig({
         rollupOptions: {
             //忽略打包vue文件
             external: [ "@ctrl/tinycolor"],
-            input: ["index.ts"],
+            input: {
+                main: "index.ts"
+            },
             output: [
                 {
                     //打包格式

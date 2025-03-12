@@ -7,6 +7,7 @@
 import { TinyColor } from "@ctrl/tinycolor";
 import {parseDate} from "./date";
 import {sdk} from "./config";
+import {ENV_TYPE, getEnv, isMiniProgram} from "./env";
 
 /**** 数据类型判断 ****/
 // 是否为字符串
@@ -471,6 +472,31 @@ export const isMini = (): boolean => {
 	// #ifdef MP
 	return true
 	// #endif
+}
+/**
+ * 是否为微信小程序环境
+ */
+export const isWxMini = (): boolean => {
+	// #ifdef H5
+	if ( typeof window !== "undefined") return getEnv() == ENV_TYPE.WXMINI
+	// #endif
+	try{
+		const SystemInfo = sdk && sdk.getSystemInfoSync && sdk.getSystemInfoSync();
+		// @ts-ignore
+		if(SystemInfo?.host?.env){
+			// @ts-ignore
+			return (SystemInfo.host.env || "").toLowerCase() == "wechat"
+		}
+		else {
+			return (SystemInfo?.uniPlatform || SystemInfo?.platform).toLowerCase() == "mp-weixin"
+		}
+	}catch(e){
+		//TODO handle the exception
+	}
+	// #ifndef MP-WEIXIN
+	return false
+	// #endif
+	return true;
 }
 
 // windows 浏览器
