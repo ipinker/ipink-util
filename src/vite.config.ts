@@ -32,7 +32,7 @@ export default defineConfig({
         },
         rollupOptions: {
             //忽略打包vue文件
-            external: [ "@ctrl/tinycolor"],
+            external: [],
             input: {
                 main: "index.ts"
             },

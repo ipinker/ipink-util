@@ -26,7 +26,7 @@ const transformData = (obj: AnyObject): string => {
 		return ''
 	}
 }
-const genJumpUrl = (pageUrl = '', params: AnyObject): string => {
+export const genJumpUrl = (pageUrl = '', params: AnyObject): string => {
 	if (!params) {
 		params = {}
 	}

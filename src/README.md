@@ -1,7 +1,37 @@
-# JavaScript 工具类
+# JavaScrip & UniApp 工具类
 
 ## 通用的js工具类， 以及包涵特殊的uniapp环境特有工具方法
 
+#### 涉及主题请参考 ipink-theme | ipink-themejs
+* vue3 可以使用 ipink-theme
+```typescript
+// store/theme.ts
+import { createThemeStore } from "pink-theme";
+// const useThemeStore = createThemeStore(app: Vue, options: ThemeOptions);
+// (app?: any, options ?: ThemeOptions)
+export const useThemeStore = createThemeStore();
+// pages/index.vue
+import {useThemeStore} from "@/store/theme";
+const useStore = useThemeStore();
+const layoutBgColor = computed(() => useStore.theme?.colorBgLayout);
+console.log(layoutBgColor)
+```
+* 其他使用 ipink-themejs
+```typescript
+	// 自定义颜色值 List<SeedMap>
+	import { createThemeList } from "ipink-theme"
+    // 默认生成 黑,白 两种
+	console.log(createThemeList())
+	// createThemeList (options ?: ThemeOptions )
+	const themeList: ColorToken[] = createThemeList({
+		themeList: [],
+		// 是否生成对应的暗黑主题, 
+		// false: 则只生成亮色主题
+		// true : 每种主题都会生成对应的暗黑主题
+		// id生成: blue => blue-light, blue-dark
+		useDark: false, 
+	})
+```
 
 #### 这里把Config.ts文件Copy到这里，可参考
 ```typescript
