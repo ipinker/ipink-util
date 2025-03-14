@@ -1,7 +1,7 @@
 import { getPageUrl } from "./get"
 import { isString } from "./is"
 import {ENV_TYPE, EnvKey, EnvVal, getEnv} from "./env";
-import {getSdk, win} from "./config";
+import {Config, getSdk, win} from "./config";
 import {toast} from "./toast";
 import {navigateToMiniProgram} from "./navigation";
 
@@ -193,6 +193,8 @@ export const getParamsByScheme = (scheme: string, env: EnvKey) => {
  * 目前支持: 普通https http
  * @param url
  * @param navigateType 2:redirectTo 3:switchTab 4:reLaunch 1:navigateTo
+ *
+ * 非H5页面会跳转 Config.webview_path ， app跳转失败会调用plus api, 其他平台没反应，如果非默认路径请设置Config.webview_path
  */
 export const jump = (url: string, navigateType = 1) => {
     let sdk = getSdk();
@@ -273,7 +275,7 @@ export const jump = (url: string, navigateType = 1) => {
 		if(sdk){
 			if (url.startsWith("https://") || url.startsWith("http://")) {
 				_jump({
-					url: "/pages/webview/index?url=" + encodeURIComponent(url),
+					url: Config.webview_path + "?url=" + encodeURIComponent(url),
 					fail: () => {
 						if(typeof plus !== "undefined"){
 							plus.runtime.openURL(url)
@@ -298,6 +300,7 @@ interface AddNextUrlOption {
  * @param url
  * @param options { AddNextUrlOption }
  * @param options.key 默认【nextUrl】
+ * @param options.delParamArr 对url执行删除不要的qeury
  */
 export const addNextUrl = (url: string, options?: AddNextUrlOption) => {
 	options = options || {}

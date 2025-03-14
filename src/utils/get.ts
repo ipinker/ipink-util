@@ -5,7 +5,7 @@ export interface KeyValue<T> {
 }
 /**
  * @desc 获取页面的url
- * @return: { currentPageLong: string, currentPage: string }
+ * @return: string
  */
 export const getPageUrl = (): string => {
 	// 仅出现在 H5 平台下的代码

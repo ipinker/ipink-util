@@ -19,6 +19,7 @@ export declare interface IConfig {
     login_url?: string
 	use_inner_toast?: boolean
 	toast_duration?: number
+    webview_path?: string
     [prop: string]: any
 }
 
@@ -51,7 +52,12 @@ export class Config {
      * toast 持续时间
      */
     static toast_duration: number = 2400;
-
+    /**
+     * 非H5使用，打开一个webview页面显示指定的 h5 url 页面
+     * 页面需接收 【url】query
+     * 在 jump 方法中非H5平台会使用到该属性
+     */
+    static webview_path: string = "/pages/webview/index"
     /**
 	 * 设置配置信息
 	 * 如果设置Http相关的配置， 使用HttpConfig.setConfig

@@ -131,7 +131,7 @@ export class Cache implements IStorage {
             return false;
 		}
 	}
-
+	removeItem = this.remove;
     /**
      * @desc 清除缓存
      * @return: boolean

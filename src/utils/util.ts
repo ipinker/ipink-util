@@ -481,9 +481,21 @@ export function hasKey (obj: { [propName: string] : any }, key: string) {
 }
 
 
-
-
-// 设置页面title
+/**
+ * 设置页面title
+ * @param title
+ * 如果title被base64编码且需要解析，页面query需要拼上 base64=1
+ * @example `
+ * 	import { base64encode, jump } from "ipink-util"
+ * 	const title = base64encode("呵呵")
+ * 	jump("/pages/home/index?title=" + title + "&base64=1");
+ *
+ * 	当前页面的url:  localhost:8080/app/#/pages/home/index?title=dsadqweqeqweqwe&base64=1
+ * 	setTitleName(title) => "呵呵"
+ * 	当前页面的url:  localhost:8080/app/#/pages/home/index?title=dsadqweqeqweqwe
+ * 	setTitleName(title) => "dsadqweqeqweqwe"
+ * `
+ */
 export const setTitleName = (title = "") => {
 	if(typeof window !== "undefined" && typeof document !== "undefined") {
 		try {
@@ -1008,7 +1020,7 @@ interface IScanCodeOption {
 export const BAR_CODE_TYPE = ["EAN_8", "EAN_13", "CODE_25", "CODE_39", "CODE_128", "UPC_A", "UPC_E"];
 /**
  * 扫码
- * @param options
+ * @param options { IScanCodeOption }
  */
 export const scanCode = (options: IScanCodeOption) => {
 	const {

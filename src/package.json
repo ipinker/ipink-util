@@ -1,6 +1,6 @@
 {
 	"name": "ipink-util",
-	"version": "1.4.1",
+	"version": "1.4.3",
 	"description": "util.js",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
@@ -35,10 +35,6 @@
 		"global.d.ts",
 		"LICENSE"
 	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/ipinker/ipink-util.git"
-	},
 	"scripts": {
 		"build": "tsc --noEmit && vite build",
         "build:test": "tsc --noEmit && vite build --mode test",
