@@ -13,7 +13,7 @@ import {
 } from "./is";
 import {getPageUrl, KeyValue} from './get';
 import {ENV_TYPE, getEnv, isMiniProgram} from "./env";
-import {sdk, win} from "./config";
+import {getSdk, win} from "./config";
 import {toast} from "./toast";
 import {Storage} from "./cache"
 
@@ -140,6 +140,7 @@ export function navigateBack(delta?: number) {
         return
     }
 	//#endif
+    let sdk = getSdk();
 	//#ifndef H5
 	try{
 		if(sdk){
@@ -457,6 +458,7 @@ export function copyValue (val: string, options?: CopyOptionsType) {
         return;
     }
 	// #endif
+    let sdk = getSdk();
 	// #ifndef H5
 	try{
 		sdk && sdk.setClipboardData && sdk.setClipboardData({
@@ -513,6 +515,7 @@ export const setTitleName = (title = "") => {
 			return
 		}
 	}
+    let sdk = getSdk();
 	sdk && sdk.setNavigationBarTitle({
 		title: title,
 		fail: () => {
@@ -555,6 +558,7 @@ export const getRefInfo = (ref: string, that: any, options?: IGetRefInfoOption) 
 			scrollOffset: true
 		}
 	}
+    let sdk = getSdk();
 	if(!sdk) return Promise.resolve(null);
 	return new Promise((resolve) => {
 		if (!ref) {
@@ -721,6 +725,7 @@ export const getLocation = async (options: IGetLocationOption) => {
 		// #endif
 
 		try {
+    		let sdk = getSdk();
 			if(sdk){
 				// 默认为 wgs84 返回 gps 坐标，gcj02 返回国测局坐标
 				let type = 'gcj02'

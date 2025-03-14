@@ -1,12 +1,12 @@
 /**
  * 该文件请求仅适用于uniapp ｜ wx
  */
-import {HttpConfig, interceptor, sdk} from './config';
+import {HttpConfig, interceptor, getSdk} from './config';
 import { toast as selfToast } from "./toast"
 import {Storage} from "./cache"
 import {
     IBaseResponse, IErrorResponse,
-    IfUnknown,
+    IfUnknown, InterceptorTypeEnum,
     IResponse,
     LoadingType,
     MethodsHeaders,
@@ -100,6 +100,21 @@ export declare interface IRequestConfigOption {
     description?: string
 }
 
+export const addHeaderToken = (header: RawAxiosRequestHeaders) => {
+    if(!header.Authorization){
+        let token = ""
+        if(HttpConfig.getToken){
+            token = HttpConfig.getToken()
+        }
+        else {
+            token = Storage.get(HttpConfig.token_key)
+        }
+        if(token){
+            header.Authorization =  token ? `${HttpConfig.token_type}${HttpConfig.token_type ? ' ' : ''}${token}` : '';
+        }
+    }
+}
+
 /**
  * Uniapp or Wx 环境下的请求方法
  *
@@ -178,7 +193,7 @@ export declare interface IRequestConfigOption {
  */
 export const request = <T = unknown>(
     baseConfig: IRequestConfigOption | string,
-    data: AnyObject, superConfig?: IRequestConfigOption
+    data?: AnyObject, superConfig?: IRequestConfigOption
 ): Promise<IfUnknown<T, IResponse<unknown>>> => {
     // 处理 baseConfig 为 string 类型
 	if(typeof baseConfig === "string") baseConfig = {
@@ -208,7 +223,7 @@ export const request = <T = unknown>(
 		prefix, // 前缀
 	} = config;
 	const reqUrl = genRequestUrl(url || HttpConfig.base_url, api, prefix)
-
+    let sdk = getSdk();
 	if (showLoading) {
         if(typeof loading == "function") {
             loading(loadingText || '');
@@ -228,24 +243,13 @@ export const request = <T = unknown>(
 				...header
 			},
         }
-        if(!_options.header.Authorization){
-            let token = ""
-            if(HttpConfig.getToken){
-                token = HttpConfig.getToken()
-            }
-            else {
-                token = Storage.get(HttpConfig.token_key)
-            }
-            if(token){
-                _options.header.Authorization =  token ? `${HttpConfig.token_type}${HttpConfig.token_type ? ' ' : ''}${token}` : '';
-            }
-        }
+        addHeaderToken(_options.header)
         _options = interceptor("BeforeRequest",_options )
 		const request = {
             ... _options,
 			success: (res: IBaseResponse<IResponse<unknown>>) => {
-                res = interceptor("AfterRequest",res )
 				let data: IResponse<unknown> = res.data || {};
+                data = interceptor("AfterRequest",data )
 				let ok = false;
                 let errMsg = ""
 				if(res.statusCode === 200){
@@ -269,7 +273,7 @@ export const request = <T = unknown>(
                 }
                 else {
 					errMsg = "您的访问出现了一点问题，请稍后再做尝试！"
-                    interceptor("" + res.statusCode,res )
+                    interceptor("" + res.statusCode as InterceptorTypeEnum,res )
 				}
                 if(showToast){
                     if(typeof toast === "function") {

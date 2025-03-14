@@ -6,7 +6,7 @@
 
 import { TinyColor } from "@ctrl/tinycolor";
 import {parseDate} from "./date";
-import {sdk} from "./config";
+import {getSdk} from "./config";
 import {ENV_TYPE, getEnv, isMiniProgram} from "./env";
 
 /**** 数据类型判断 ****/
@@ -459,6 +459,7 @@ export const isMini = (): boolean => {
 	// #ifdef H5
 	if ( navigator && navigator.userAgent && navigator.userAgent.toLowerCase().indexOf("Mini") > -1) return true;
 	// #endif
+	let sdk = getSdk();
 	try{
 		const SystemInfo = sdk && sdk.getSystemInfoSync && sdk.getSystemInfoSync();
 		// 非 H5 ｜ uniapp 平台不支持判断
@@ -481,6 +482,7 @@ export const isWxMini = (): boolean => {
 	if ( typeof window !== "undefined") return getEnv() == ENV_TYPE.WXMINI
 	// #endif
 	try{
+		let sdk = getSdk();
 		const SystemInfo = sdk && sdk.getSystemInfoSync && sdk.getSystemInfoSync();
 		// @ts-ignore
 		if(SystemInfo?.host?.env){

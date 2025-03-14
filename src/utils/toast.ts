@@ -1,5 +1,5 @@
 import {Storage} from "./cache";
-import {Config, sdk} from "./config";
+import {Config, getSdk} from "./config";
 import ShowModalOptions = UniNamespace.ShowModalOptions;
 
 
@@ -32,6 +32,7 @@ export const htmlToast = (content: string, duration = 3000, complete?: Function,
 		// 将 keyframes样式写入style内
 		style.innerHTML = toastStyle;
 		var toastBox = document.querySelector("div.toast-box");
+    	let sdk = getSdk();
 		if (!toastBox) {
 			var toast_container = document.createElement("div"); //父节点
 			toast_container.className = "toast_container"; //classname
@@ -154,6 +155,7 @@ export const toast = (options: IToast | string) => {
 export const showModal = (options: ShowModalOptions): Promise<boolean> => {
 	return new Promise(resolve =>{
 
+    	let sdk = getSdk();
 		if(sdk){
 			uni.showModal({
 				... (options || {}),

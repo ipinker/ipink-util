@@ -1,22 +1,24 @@
-import {CloseLoadingType, ContentType, InterceptorType, LoadingType, Method, ToastType} from "./typing";
+import {
+    CloseLoadingType,
+    ContentType,
+    InterceptorType,
+    InterceptorTypeEnum,
+    LoadingType,
+    Method,
+    ToastType
+} from "./typing";
 import {IToast} from "./toast";
-import {PresetColorType, SeedMap, SeedOption} from "ipink-themejs";
+import { hasKey } from "./util";
 
 export declare interface IConfig {
     appName?: string
     appId?: string
     language?: string
-
-    axios?: any
-    api_prefix?: string
-    request_url?: string
     socket_url?: string
     origin_url?: string
     login_url?: string
-    token_key?: string
-    request_timeout?: number
-    request_method?: Method
-
+	use_inner_toast?: boolean
+	toast_duration?: number
     [prop: string]: any
 }
 
@@ -35,23 +37,11 @@ export class Config {
      */
     static language = ""
     /**
-     * API 请求前缀
-     */
-    static api_prefix = ""
-    /**
      * Url Option
      */
-    static request_url = ""; // HTTP 一般请求url
-    static request_method: Method = "POST"; // 默认请求方法
     static socket_url = ""; // socket url
     static origin_url = ""; // 跳转的URL前缀
     static login_url = "";  // 登陆url
-    static token_key = "A__APP_TOKEN__Z" // Token 存储key
-    static request_timeout = 60000;// 请求超时时间
-    /**
-     * Http
-     */
-    static axios: any = null;
 
     /**
      * 组件内部调用内部的toast方法时， 是否用内部定义的html toast， 否则使用uni.showToast
@@ -62,12 +52,22 @@ export class Config {
      */
     static toast_duration: number = 2400;
 
-    // 设置配置信息
+    /**
+	 * 设置配置信息
+	 * 如果设置Http相关的配置， 使用HttpConfig.setConfig
+	 *
+	 * 如果主题相关使用 ipink-theme.ThemeConfig.setToken
+	 */
     static setConfig(params: IConfig) {
         if (params) {
-            Object.keys(params).forEach((v: keyof IConfig) => {
+            Object.keys(params).forEach((key: keyof IConfig) => {
                 // @ts-ignore
-                Config[v] = params[v]
+                Config[key] = params[key]
+				// 如果设置了Config的默认属性
+				if(hasKey(HttpConfig, key as string)) {
+					// @ts-ignore
+					HttpConfig[key] = Config[key]
+				}
             })
         }
     }
@@ -100,7 +100,26 @@ declare interface IHttpConfig {
      */
     token_key?: string
     /**
-     * 外部传入的axios包
+     * 外部传入的axios包, uniapp 环境下使用 request；js环境下使用 http， 使用request此项忽略
+	 *
+	 * @example `
+     *  import { Config, HttpConfig, createHttp } from "ipink-util"
+     *
+     *  HttpConfig.setConfig({
+     *    base_url: "http://www.baidu.com"
+     *  })
+     *
+     *  const http = createHttp();
+     *
+     *  http<string>({
+     *      url: "/api/public/upload",
+     *      method: "POST",
+     *      data: {},
+     *      headers: {
+     *          'Content-Type': 'multipart/form-data'
+     *      }
+     *  })
+     * `
      */
     axios?: any | null
     /**
@@ -142,7 +161,7 @@ declare interface IHttpConfig {
      */
     show_loading?: boolean
     loading?: null | LoadingType;
-    closeLoading: null | CloseLoadingType
+    closeLoading?: null | CloseLoadingType
     /**
      * 判断StatusCode == 200的情况下，根据该值判断接口出餐是否逻辑正确， 否则赋值 [ok：false]
      */
@@ -155,50 +174,72 @@ declare interface IHttpConfig {
      * 默认错误信息
      */
     default_error_msg?: string
+
     /**
      * http 请求拦截器， 在这里可设置自定义操作
      * @param type 拦截到的类型
      * @param data 可修改的源数据， return data 即修改完成
      *
      * @example `
-     *    HttpConfig.interceptor = (type, data) => {
+     *    HttpConfig.interceptor = (type: InterceptorTypeEnum, data: any) => {
      *
      *        switch (type) {
-     *            // 入参
-     *            case "data":
+     *            // 请求前，对配置和入参做一些处理
+     *            case "BeforeRequest":
+     *            // 执行中， data为RequestTask， 可执行 RequestTask.abort() 终止请求
+     *            case "ExecRequest":
+     *                typeof data = { abort: () => void }
      *                break;
-     *            // 出参
-     *            case "response":
+     *            // 请求完成，对出参做一些处理， 例如： 整体出参揭秘等
+     *            case "AfterRequest":
      *                break;
+     *            // upload 方法，选择文件后对选择的文件做一些处理；虽然该函数提供 choosedCallback：() => boolean 入参函数
+     *            case "AfterChooseFile":
+     *                break;
+     *            // 调用UploadFile前，对配置和入参做一些处理
+     *            case "BeforeUpload":
+     *                break;
+	 *			  // 调用UploadFile时, 对请求进行管理
+     *            case "ExecUpload":
+	 *				  typeof data = {
+	 *					abort: () => void
+	 *					onProgressUpdate: ({progress: number, totalBytesSent: number, totalBytesExpectedToSend: number}) => {} // 监听上传进度变化
+	 *					onHeadersReceived // 仅微信小程序平台支持, 见官方文档
+	 *					offProgressUpdate // 仅微信小程序平台支持, 见官方文档
+	 *					offHeadersReceived // 仅微信小程序平台支持, 见官方文档
+	 *				  }
+     *                break;
+     *            // UploadFile | UploadMoreFile 方法，对上传完成后的数据进行一些处理
+     *            case "AfterUpload":
+     *                break;
+     *
      *
      *        }
      *        return data
      *    }
      * `
      */
-    interceptor?: InterceptorType | null
-    /**
-     * 设置默认配置
-     * @param params { IHttpConfig }
-     */
-    setConfig?: (params: IHttpConfig) => void
+    interceptor?: InterceptorType
 
 }
 
+/**
+ * 使用本工具包的Http请求， 需要设置该配置， 不用则忽略
+ */
 export class HttpConfig {
     /**
      * 请求的URL
      */
-    static base_url: string = Config.request_url;
+    static base_url: string = "";
     /**
      * 超时时间
      */
-    static timeout: number = Config.request_timeout;
+    static timeout: number = 60000;
     static content_type: string = "application/json";
     /**
      * 默认方法
      */
-    static default_method: Method = Config.request_method;
+    static default_method: Method = "POST"
     /**
      * 获取token函数吗未设置则取 Storage.get(AxiosConfig.token_key)
      */
@@ -207,19 +248,38 @@ export class HttpConfig {
     /**
      * 获取Token的Key， 默认使用的是  import {Storage} from "ipink-util";Storage.get
      */
-    static token_key: string = Config.token_key
+    static token_key: string = "A__APP_TOKEN__Z"
     /**
-     * 外部传入的axios包, uniapp 环境下使用 request；js环境下使用 http
+     * 外部传入的axios包, uniapp 环境下使用 request；js环境下使用 http， 使用request此项忽略
+	 *
+	 * @example `
+     *  import { Config, HttpConfig, createHttp } from "ipink-util"
+     *
+     *  HttpConfig.setConfig({
+     *    base_url: "http://www.baidu.com"
+     *  })
+     *
+     *  const http = createHttp();
+     *
+     *  http<string>({
+     *      url: "/api/public/upload",
+     *      method: "POST",
+     *      data: {},
+     *      headers: {
+     *          'Content-Type': 'multipart/form-data'
+     *      }
+     *  })
+     * `
      */
-    static axios: any | null = Config.axios
+    static axios: any | null = null
     /**
      * 请求前缀
      */
-    static api_prefix: string = Config.api_prefix;
+    static api_prefix: string = "";
     /**
      * 上传请求前缀
      */
-    static upload_prefix: string = HttpConfig.api_prefix;
+    static upload_prefix: string = "";
     /**
      * 文件上传成功后用来取值，仅限于 example
      * 单文件上传 取data， data[0];多文件直接返回data
@@ -271,7 +331,7 @@ export class HttpConfig {
      * @param data 可修改的源数据， return data 即修改完成
      *
      * @example `
-     *    HttpConfig.interceptor = (type, data) => {
+     *    HttpConfig.interceptor = (type: InterceptorTypeEnum, data: any) => {
      *
      *        switch (type) {
      *            // 请求前，对配置和入参做一些处理
@@ -284,12 +344,24 @@ export class HttpConfig {
      *            case "AfterRequest":
      *                break;
      *            // upload 方法，选择文件后对选择的文件做一些处理；虽然该函数提供 choosedCallback：() => boolean 入参函数
-     *            case "ChoosedFile":
+     *            case "AfterChooseFile":
+     *                break;
+     *            // 调用UploadFile前，对配置和入参做一些处理
+     *            case "BeforeUpload":
+     *                break;
+	 *			  // 调用UploadFile时, 对请求进行管理
+     *            case "ExecUpload":
+	 *				  typeof data = {
+	 *					abort: () => void
+	 *					onProgressUpdate: ({progress: number, totalBytesSent: number, totalBytesExpectedToSend: number}) => {} // 监听上传进度变化
+	 *					onHeadersReceived // 仅微信小程序平台支持, 见官方文档
+	 *					offProgressUpdate // 仅微信小程序平台支持, 见官方文档
+	 *					offHeadersReceived // 仅微信小程序平台支持, 见官方文档
+	 *				  }
      *                break;
      *            // UploadFile | UploadMoreFile 方法，对上传完成后的数据进行一些处理
-     *            case "UploadFiled":
+     *            case "AfterUpload":
      *                break;
-     *
      *
      *
      *        }
@@ -306,7 +378,7 @@ export class HttpConfig {
     static setConfig(params: IHttpConfig): void {
         Object.keys(params || {}).forEach((key: string) => {
             // @ts-ignore
-            AxiosConfig[key] = params[key]
+            HttpConfig[key] = params[key]
         })
     }
 }
@@ -316,15 +388,30 @@ export class HttpConfig {
  * @param type
  * @param data
  */
-export function interceptor(type: string, data: any) {
+export function interceptor(type: InterceptorTypeEnum, data: any) {
     if (typeof HttpConfig.interceptor === "function") {
-        return HttpConfig.interceptor(type, data);
+        const result = HttpConfig.interceptor(type, data);
+        return result || data;
     }
     return data;
 }
 
+/**
+ * Window ｜ Self ｜ GlobalThis 对象
+ */
 // @ts-ignore
-export const sdk: Uni = "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : "undefined" != typeof my ? my : "undefined" != typeof qq ? qq : "undefined" != typeof swan ? swan : null; // uni | wx | qq | my
-// @ts-ignore
-export const win: Window = "undefined" != typeof window ? window : "undefined" != this ? this : "undefined" != self ? self : null; // window | self | this
-
+export const win: Window = "undefined" != typeof window ? window : "undefined" != globalThis ? globalThis : "undefined" != self ? self : null; // window | self | globalThis
+/**
+ * 获取调用该方法的环境sdk
+ * @example `
+ *  import { getSdk } from "ipink-util"
+ *  // uniapp
+ *  getSdk() === uni
+ *  // wx
+ *  getSdk() === wx
+ * `
+ */
+export const getSdk = (): Uni => {
+    // @ts-ignore
+    return "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : "undefined" != typeof my ? my : "undefined" != typeof qq ? qq : "undefined" != typeof swan ? swan : null; // uni | wx | qq | my
+}

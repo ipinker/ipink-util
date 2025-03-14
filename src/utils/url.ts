@@ -1,7 +1,7 @@
 import { getPageUrl } from "./get"
 import { isString } from "./is"
 import {ENV_TYPE, EnvKey, EnvVal, getEnv} from "./env";
-import {sdk, win} from "./config";
+import {getSdk, win} from "./config";
 import {toast} from "./toast";
 import {navigateToMiniProgram} from "./navigation";
 
@@ -195,6 +195,7 @@ export const getParamsByScheme = (scheme: string, env: EnvKey) => {
  * @param navigateType 2:redirectTo 3:switchTab 4:reLaunch 1:navigateTo
  */
 export const jump = (url: string, navigateType = 1) => {
+    let sdk = getSdk();
 	let status = false;
 	let _jump = navigateType == 2 ? sdk.redirectTo : navigateType == 3 ? sdk.switchTab : navigateType == 4 ? sdk.reLaunch : sdk.navigateTo
 	if(sdk && url.startsWith("/")){

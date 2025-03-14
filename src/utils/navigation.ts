@@ -1,5 +1,5 @@
 import {ENV_TYPE, EnvVal, getEnv} from "./env";
-import {sdk, win} from "./config";
+import {getSdk, win} from "./config";
 import {showModal} from "./toast";
 import {parseQuery} from "./url";
 
@@ -135,6 +135,7 @@ export const navigateToMiniProgram = async (params: JumpAppOption) => {
 
 	// #endif
 
+    let sdk = getSdk();
 	// #ifdef APP
     if(sdk && typeof plus !== "undefined") {
         if(useModal) {
@@ -211,6 +212,7 @@ export const navigateToMiniProgram = async (params: JumpAppOption) => {
 }
 
 function wxNavigateToMiniProgram (appId: string, path: string, extraData?: AnyObject, success?: Function, fail?: Function, version = "release") {
+    let sdk = getSdk();
 	sdk && sdk.navigateToMiniProgram({
 		appId: appId,
 		path: path,

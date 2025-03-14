@@ -1,4 +1,4 @@
-import {Config, sdk, win} from "./config";
+import {Config, getSdk, win} from "./config";
 
 interface CacheValue {
     value?: any
@@ -60,6 +60,7 @@ export class Cache implements IStorage {
 				expire,
 				createTime: Date.now()
 			}
+			let sdk = getSdk();
             // @ts-ignore
 			sdk ?
 				sdk!.setStorageSync(key, JSON.stringify(cacheValue)) :
@@ -80,6 +81,7 @@ export class Cache implements IStorage {
      */
 	get(key: string): any {
 		try{
+    		let sdk = getSdk();
 			key = this.genKey(key);
             let cacheValue: CacheValue = sdk ? (sdk.getStorageSync(key) || {}) as CacheValue :
 				win ? (win.localStorage.getItem(key) || {}) as CacheValue :

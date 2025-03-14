@@ -207,9 +207,68 @@ export declare interface IUploadMoreResponse extends IResponse<string[] | AnyObj
 export type LoadingType = (title: string | WechatMiniprogram.ShowLoadingOption) => any
 export type CloseLoadingType = () => any
 export type ToastType = (title: string | UniNamespace.ShowToastOptions) => void
+
+export type InterceptorTypeEnum =
+    | "BeforeRequest"
+    | "ExecRequest"
+    | "AfterRequest"
+    | "AfterChooseFile"
+    | "BeforeUpload"
+    | "ExecUpload"
+    | "AfterUpload"
+    | "401"
+    | "403"
+    | "404"
+    | "408"
+    | "500"
+    | "501"
+    | "502"
+    | "508"
+    | string
 /**
- *
- */
-export type InterceptorType = (type: string, data: any) => any
+     * http 请求拦截器， 在这里可设置自定义操作
+     * @param type { InterceptorTypeEnum } 拦截到的类型
+     * @param data { any } 可修改的源数据， return data 即修改完成
+     *
+     * @example `
+     *    HttpConfig.interceptor = (type: InterceptorTypeEnum, data: any) => {
+     *
+     *        switch (type) {
+     *            // 请求前，对配置和入参做一些处理
+     *            case "BeforeRequest":
+     *            // 执行中， data为RequestTask， 可执行 RequestTask.abort() 终止请求
+     *            case "ExecRequest":
+     *                typeof data = { abort: () => void }
+     *                break;
+     *            // 请求完成，对出参做一些处理， 例如： 整体出参揭秘等
+     *            case "AfterRequest":
+     *                break;
+     *            // upload 方法，选择文件后对选择的文件做一些处理；虽然该函数提供 choosedCallback：() => boolean 入参函数
+     *            case "AfterChooseFile":
+     *                break;
+     *            // 调用UploadFile前，对配置和入参做一些处理
+     *            case "BeforeUpload":
+     *                break;
+	 *			  // 调用UploadFile时, 对请求进行管理
+     *            case "ExecUpload":
+	 *				  typeof data = {
+	 *					abort: () => void
+	 *					onProgressUpdate: ({progress: number, totalBytesSent: number, totalBytesExpectedToSend: number}) => {} // 监听上传进度变化
+	 *					onHeadersReceived // 仅微信小程序平台支持, 见官方文档
+	 *					offProgressUpdate // 仅微信小程序平台支持, 见官方文档
+	 *					offHeadersReceived // 仅微信小程序平台支持, 见官方文档
+	 *				  }
+     *                break;
+     *            // UploadFile | UploadMoreFile 方法，对上传完成后的数据进行一些处理
+     *            case "AfterUpload":
+     *                break;
+     *
+     *
+     *        }
+     *        return data
+     *    }
+     * `
+     */
+export type InterceptorType = (type: InterceptorTypeEnum, data: any) => any
 
 export type IfUnknown<T, K> = unknown extends T ? (T extends unknown ? K : T) : T;

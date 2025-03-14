@@ -7,10 +7,10 @@
 export interface LoanOptionType {
     /** @desc 贷款日利率 **/
     dayRate?: number
-    /** @desc 贷款年利率 **/ 
+    /** @desc 贷款年利率 **/
     yearRate?: number
     /** @desc 总金额 **/
-    amount?: number 
+    amount?: number
     /** @desc 贷款期数 **/
     months?: number
 }
@@ -34,7 +34,7 @@ export interface LoanResultType {
         /** @desc 最高月供 **/
         monthly?: number | string
         /** @desc 累计还款总额 **/
-        totalRepayment?: number | string 
+        totalRepayment?: number | string
         /** @desc 累计还款利息总额 **/
         totalInterest?: number | string
     }
@@ -47,9 +47,9 @@ export class Loan {
 		}
 		return Loan.instance;
 	}
-	
+
 	constructor () {}
-	
+
     /**
      * @desc 先息后本
      * @param options { LoanOptionType }
@@ -71,7 +71,7 @@ export class Loan {
 			let t1 = totalInterest / months; //第i月还款利息
 			interestM = t1; //第i月还款额 = 每月偿还利息 最后一个月还款额 = 每月利息 + 贷款本金
 			if (i == months) { // 最后一个月
-				capital = amount; // 
+				capital = amount; //
 				interestM = t1 + amount;
 			}
 			objArray[i - 1] = {
@@ -83,11 +83,11 @@ export class Loan {
             };
 			interestTotal = interestTotal + interestM;
 		}
-	 
+
 		interestTotal = (Math.round(interestTotal * 100)) / 100; //累计还款总额
 		let monthly: string  = objArray[0]['total'] as string; //月供 最高月供
 		let totalRepayment: string = "" + interestTotal; //累计还款总额
-	 
+
 		let resArray: LoanResultType = {
 			'plan' : objArray,
 			'info' : {
@@ -96,10 +96,10 @@ export class Loan {
 				totalInterest : parseFloat("" + totalInterest).toFixed(0)
 			}
 		};
-	 
+
 		return resArray;
 	}
-	
+
     /**
      * @desc 等本等金
      * @param options { LoanOptionType }
@@ -112,7 +112,7 @@ export class Loan {
             return {};
         }
 		if (!yearRate) yearRate = dayRate * 365;
-		
+
 		let objArray: LoanPlanType[] = new Array();
 		let interestM: number = 0; // 月还款额
 		let interestTotal: number = 0; // 累计还款总额
@@ -130,11 +130,11 @@ export class Loan {
             };
 			interestTotal = interestTotal + interestM;
 		}
-	 
+
 		interestTotal = (Math.round(interestTotal * 100)) / 100; //累计还款总额
 		let monthly: string = objArray[0]['total'] as string; //月供 最高月供
 		let totalRepayment: string = "" + interestTotal; //累计还款总额
-	 
+
 		let resArray: LoanResultType = {
 			'plan' : objArray,
 			'info' : {
@@ -143,10 +143,10 @@ export class Loan {
 				totalInterest : parseFloat("" + totalInterest).toFixed(0)
 			}
 		};
-	 
+
 		return resArray;
 	}
-	
+
     /**
      * @desc 等额本金
      * @param options { LoanOptionType }
@@ -159,7 +159,7 @@ export class Loan {
             return {};
         };
 		if (!yearRate) yearRate = dayRate * 365;
-	 
+
 		let active = yearRate * 10 / 12 * 0.001;
 		let objArray: LoanPlanType[] = new Array();
 		let interestM: number = 0; //月还款额
@@ -192,10 +192,10 @@ export class Loan {
 				totalInterest : parseFloat('' + totalInterest).toFixed(0)
 			}
 		};
-	 
+
 		return resArray;
 	}
-	
+
     /**
      * @desc 等额本息
      * @param options { LoanOptionType }
@@ -208,7 +208,7 @@ export class Loan {
             return {};
         };
 		if (!yearRate) yearRate = dayRate * 365;
-	 
+
 		let active: number = yearRate * 10 / 12 * 0.001;
 		let t1: number = Math.pow(1 + active, months);
 		let t2: number = t1 - 1;
@@ -246,7 +246,7 @@ export class Loan {
 		let monthly = monthsBack; //月供
 		let totalRepayment = (+monthsBack) * months; //累计还款总额
 		let totalInterest = totalRepayment - amount; //利息总额
-		
+
 		let resArray = {
 			plan : objArray,
 			info : {
@@ -258,6 +258,3 @@ export class Loan {
 		return resArray;
 	}
 }
-
-
-export const LoanInstance =  Loan.getInstance();

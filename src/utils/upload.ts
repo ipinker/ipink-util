@@ -1,4 +1,4 @@
-import {genRequestUrl, IRequestConfigOption} from "./request";
+import {addHeaderToken, genRequestUrl, IRequestConfigOption} from "./request";
 import {
     IErrorResponse, IResponse, IUploadMoreResponse,
     IUploadResponse,
@@ -7,11 +7,12 @@ import {
     RawAxiosRequestHeaders,
     ToastType
 } from "./typing";
-import {HttpConfig, interceptor, sdk} from "./config";
+import {HttpConfig, interceptor, getSdk} from "./config";
 import {isArray, isJsonString, isMini, isString, isWxMini} from "./is";
 import {allSettled, hasKey} from "./util";
 import { toast as selfToast} from "./toast"
 import {chooseImage, chooseOtherFile, chooseVideo} from "./image";
+import {Storage} from "./cache"
 
 export declare interface IUploadConfigOption extends IRequestConfigOption {
     /**
@@ -60,9 +61,9 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
 		toastText ,
         toast = HttpConfig.toast,
 	} = options || {};
-
 	const reqUrl = genRequestUrl(HttpConfig.base_url, api, prefix)
 
+    let sdk = getSdk();
 	if (showLoading) {
         if(typeof loading == "function") {
             loading(loadingText || '');
@@ -72,7 +73,7 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
         }
 	}
 	return new Promise((resolve) => {
-		uni.uploadFile({
+		let _options = {
 			url: reqUrl,
 			filePath: file,
 			name: key,
@@ -81,11 +82,18 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
 			// #endif
 			formData: formData,
 			timeout: HttpConfig.timeout,
-			header,
+			header: {
+				...header
+            }
+		}
+        addHeaderToken(_options.header)
+		_options = interceptor("BeforeUpload", _options )
+		const uploadTask = uni.uploadFile({
+			... _options,
 			success: (uploadFileRes) => {
 				let errMsg = uploadFileRes.errMsg;
 				var data = isJsonString(uploadFileRes.data) ? JSON.parse(uploadFileRes.data) : (uploadFileRes.data || {});
-                data = interceptor("UploadFiled",data )
+                data = interceptor("AfterUpload",data )
 				if(uploadFileRes.statusCode == 200){
 					const ok = data[HttpConfig.code_key] == HttpConfig.code_value;
                     let urlData: string = "";
@@ -151,6 +159,8 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
                 }
 			}
 		});
+
+		interceptor("ExecUpload", uploadTask )
 	})
 }
 
@@ -178,6 +188,7 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
         toast = HttpConfig.toast,
 	} = params || {};
 
+    let sdk = getSdk();
 	if (showLoading) {
         if(typeof loading == "function") {
             loading(loadingText || '');
@@ -261,8 +272,7 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
 			}
 		}) as unknown as UniNamespace.UploadFileOptionFiles[]
     	const reqUrl = genRequestUrl(HttpConfig.base_url, api, prefix)
-
-		uni.uploadFile({
+		let _options = {
 			url: reqUrl, //仅为示例，非真实的接口地址
 			files: fileList,
 			// #ifdef MP-ALIPAY
@@ -272,10 +282,16 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
 			header: {
 				... header
 			},
+		}
+        addHeaderToken(_options.header)
+
+		_options = interceptor("BeforeUpload", _options )
+		const uploadTask = uni.uploadFile({
+			... _options,
 			success: (uploadFileRes) => {
 				let errMsg = uploadFileRes?.errMsg;
 				var data = isJsonString(uploadFileRes.data) ? JSON.parse(uploadFileRes.data) : (uploadFileRes.data || {});
-                data = interceptor("UploadFiled",data )
+                data = interceptor("AfterUpload",data )
 				if(uploadFileRes.statusCode == 200){
 					const ok = data[HttpConfig.code_key] == HttpConfig.code_value;
 					if(ok){
@@ -339,6 +355,8 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
                 }
 			}
 		});
+		interceptor("ExecUpload", uploadTask )
+
 		// #endif
 	});
 }
@@ -432,7 +450,7 @@ export const upload = async function (options: IUploadExtConfigOption, choosedCa
 			extension
 		});
 	}
-    list = interceptor("ChoosedFile",list )
+    list = interceptor("AfterChooseFile",list )
 	if(!list || !list.length) return { ok: false };
 
     if(choosedCallback){

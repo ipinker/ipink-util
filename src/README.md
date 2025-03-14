@@ -115,7 +115,7 @@ export class HttpConfig {
      */
     static token_key: string = Config.token_key
     /**
-     * 外部传入的axios包, uniapp 环境下使用 request；js环境下使用 http
+     * 外部传入的axios包, uniapp 环境下使用 request；js环境下使用 http,使用request此项忽略
      */
     static axios: any | null = Config.axios
     /**
@@ -228,8 +228,10 @@ export function interceptor(type: string, data: any) {
     return data;
 }
 
-// @ts-ignore
-export const sdk: Uni = "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : "undefined" != typeof my ? my : "undefined" != typeof qq ? qq : "undefined" != typeof swan ? swan : null; // uni | wx | qq | my
+export const getSdk = (): Uni => {
+    // @ts-ignore
+    return "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : "undefined" != typeof my ? my : "undefined" != typeof qq ? qq : "undefined" != typeof swan ? swan : null; // uni | wx | qq | my
+}
 // @ts-ignore
 export const win: Window = "undefined" != typeof window ? window : "undefined" != this ? this : "undefined" != self ? self : null; // window | self | this
 

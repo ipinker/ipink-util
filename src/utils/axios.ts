@@ -207,7 +207,12 @@ function createRequest(service: any) {
     }
 }
 
-/** 用于网络请求的实例 */
-const service = createService()
-/** 用于网络请求的方法 */
-export const http = createRequest(service)
+/**
+ * 使用
+ */
+export const createHttp = () => {		
+	/** 用于网络请求的实例 */
+	const service = createService()
+	/** 用于网络请求的方法 */
+	return createRequest(service)
+}

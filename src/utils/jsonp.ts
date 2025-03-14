@@ -1,4 +1,4 @@
-import {Config} from "./config";
+import {Config, HttpConfig} from "./config";
 
 let script: HTMLScriptElement,
 	done: boolean,
@@ -85,7 +85,7 @@ export const jsonp = <T>(url: string, params: AnyObject, options?: IJSONPOption<
 	"use strict";
 
 	options = options || {};
-	options.timeout = options.timeout || Config.request_timeout;
+	options.timeout = options.timeout || HttpConfig.timeout;
 
 	let callbackName: string = options.callback || 'callback',
 		callback: string = getUniqueCallbackName(callbackName as string);

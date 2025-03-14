@@ -1,6 +1,6 @@
 {
 	"name": "ipink-util",
-	"version": "1.3.2",
+	"version": "1.4.1",
 	"description": "util.js",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
@@ -41,6 +41,7 @@
 	},
 	"scripts": {
 		"build": "tsc --noEmit && vite build",
+        "build:test": "tsc --noEmit && vite build --mode test",
 		"preview": "vite preview"
 	},
 	"dependencies": {
