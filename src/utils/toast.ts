@@ -1,6 +1,7 @@
 import {Storage} from "./cache";
 import {Config, getSdk} from "./config";
 import ShowModalOptions = UniNamespace.ShowModalOptions;
+import ShowToastOption = WechatMiniprogram.ShowToastOption;
 
 
 export const htmlToast = (content: string, duration = 3000, complete?: Function, mask?: boolean, success?: Function, fail?: Function) => {
@@ -132,7 +133,7 @@ export const toast = (options: IToast | string) => {
 	if(Config.use_inner_toast && typeof document !== "undefined" && document.createElement) {
 		return htmlToast(title, duration, complete, mask, success, fail);
 	}
-	// @ts-ignore
+	let sdk = getSdk();
 	if(sdk) sdk.showToast({
 		title,
 		icon,
@@ -142,7 +143,7 @@ export const toast = (options: IToast | string) => {
 		fail,
 		...args,
 		complete
-	})
+	} as ShowToastOption)
 	else {
 		let errMsg = {
 			errMsg: "不支持【document】对象！"

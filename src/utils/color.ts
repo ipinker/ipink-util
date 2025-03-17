@@ -2,7 +2,7 @@ import { TinyColor } from "@ctrl/tinycolor"
 
 /**
  * 获取颜色的对象， 方便输出各种格式的颜色， 或者加工颜色再输出
- * @param color { string }
+ * @param color { TinyColor }
  */
 export const getColorObj = (color: string): TinyColor => {
     return new TinyColor(color)

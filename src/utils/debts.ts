@@ -39,6 +39,16 @@ export interface LoanResultType {
         totalInterest?: number | string
     }
 }
+
+/**
+ * 贷款计算
+ * 涉及的入参类型 { LoanOptionType }
+ * 涉及的 dayRate，yearRate两个日化年华需要*100；例如年华12%， 则 yearRate 传 12；日利率同
+ * 先息后本 xxhb
+ * 等本等金 dbdx
+ * 等额本金 debj
+ * 等额本息 debx
+ */
 export class Loan {
 	static instance: Loan | null = null;
 	static getInstance() {
