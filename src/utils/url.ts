@@ -199,7 +199,17 @@ export const getParamsByScheme = (scheme: string, env: EnvKey) => {
 export const jump = (url: string, navigateType = 1) => {
     let sdk = getSdk();
 	let status = false;
-	let _jump = navigateType == 2 ? sdk.redirectTo : navigateType == 3 ? sdk.switchTab : navigateType == 4 ? sdk.reLaunch : sdk.navigateTo
+	let _jump : any
+	if(sdk){
+
+		if(typeof uni !== "undefined"){
+			_jump = navigateType == 2 ? uni.redirectTo : navigateType == 3 ? uni.switchTab : navigateType == 4 ? uni.reLaunch : uni.navigateTo
+		}
+		else {
+			_jump = navigateType == 2 ? wx.redirectTo : navigateType == 3 ? wx.switchTab : navigateType == 4 ? wx.reLaunch : wx.navigateTo
+
+		}
+	}
 	if(sdk && url.startsWith("/")){
 		_jump({
 			url: url
@@ -212,9 +222,7 @@ export const jump = (url: string, navigateType = 1) => {
 		if (phoneNumber.indexOf("?") > -1) {
 			phoneNumber = phoneNumber.split("?")[0];
 		}
-		sdk.makePhoneCall({
-			phoneNumber
-		});
+		typeof uni !== "undefined" ? uni.makePhoneCall({phoneNumber}) : wx.makePhoneCall({phoneNumber});
 		status = true;
 	} else {
 		// #ifdef H5

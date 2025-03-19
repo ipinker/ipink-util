@@ -229,7 +229,7 @@ export const request = <T = unknown>(
             loading(loadingText || '');
         }
         else if(sdk){
-            sdk.showLoading({title: loadingText ,icon: "none"})
+            typeof uni !== "undefined" ? uni.showLoading({title: loadingText ,icon: "none"}) : wx.showLoading({title: loadingText || "" ,icon: "none"})
         }
 	}
 	return new Promise((reslove) => {
@@ -309,12 +309,12 @@ export const request = <T = unknown>(
                         closeLoading();
                     }
                     else if(sdk){
-                        sdk.hideLoading()
+                        typeof uni !== "undefined" ? uni.hideLoading() : wx.hideLoading()
                     }
                 }
 			}
 		}
-		const requestTask = sdk.request(request as unknown as UniApp. RequestOptions);
+		const requestTask = typeof uni !== "undefined" ? uni.request(request as unknown as UniApp. RequestOptions) : wx.request(request as unknown as  WechatMiniprogram.RequestOption);
         interceptor("ExecRequest", requestTask);
 	})
 };

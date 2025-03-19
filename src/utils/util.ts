@@ -144,7 +144,7 @@ export function navigateBack(delta?: number) {
 	//#ifndef H5
 	try{
 		if(sdk){
-			sdk.navigateBack && sdk.navigateBack({ delta: delta });
+			typeof uni !== "undefined" ? uni.navigateBack({ delta: delta }) : wx.navigateBack({ delta: delta });
 		}
 	}catch(e){
 	}
@@ -458,17 +458,17 @@ export function copyValue (val: string, options?: CopyOptionsType) {
         return;
     }
 	// #endif
-    let sdk = getSdk();
 	// #ifndef H5
 	try{
-		sdk && sdk.setClipboardData && sdk.setClipboardData({
+		let params = {
 			data: val,
 			success: () => {
 		        tip && toast(tip);
 		        success && success();
 		    },
 			fail: (e: any) => fail && fail(e)
-		});
+		}
+		typeof uni !== "undefined" ? uni.setClipboardData(params) : wx.setClipboardData(params);
 	}catch(e: any){
 		fail && fail(e)
 	}
@@ -528,12 +528,15 @@ export const setTitleName = (title = "") => {
 		}
 	}
     let sdk = getSdk();
-	sdk && sdk.setNavigationBarTitle({
-		title: title,
-		fail: () => {
-			if(typeof document !== "undefined") document.title = title;
-		}
-	})
+	if(sdk){
+		let params = {
+            title: title,
+            fail: () => {
+                if(typeof document !== "undefined") document.title = title;
+            }
+        }
+	    typeof uni !== "undefined" ? uni.setNavigationBarTitle(params) : wx.setNavigationBarTitle(params)
+	}
 }
 /**
  * 字符脱敏
@@ -963,17 +966,24 @@ export const backMainAppHome = (delta = 1) => {
 			return true;
 		}
 		// @ts-ignore
-		else if (sdk && sdk?.webView?.navigateBack) {
-			// @ts-ignore
-			sdk.webView.navigateBack({
-				delta
-			});
+		else if (sdk) {
+			if(typeof uni !== "undefined") {
+				// @ts-ignore
+				uni.webView?.navigateBack({delta})
+			}
+			else {
+				// @ts-ignore
+				wx.webView.navigateBack({delta});
+			}
 			return true;
 		}
 		// #endif
-		uni.navigateBack({
-			delta: delta
-		});
+		if(typeof uni !== "undefined") {
+			uni.navigateBack({delta: delta});
+		}
+		else if(typeof wx !== "undefined") {
+			wx.navigateBack({delta: delta});
+		}
 	}
 	return true;
 }

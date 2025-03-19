@@ -69,7 +69,7 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
             loading(loadingText || '');
         }
         else if(sdk){
-            sdk.showLoading({title: loadingText ,icon: "none"})
+            typeof uni !== "undefined" ? uni.showLoading({title: loadingText ,icon: "none"}) : wx.showLoading({title: loadingText || "",icon: "none"})
         }
 	}
 	return new Promise((resolve) => {
@@ -154,7 +154,7 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
                         closeLoading();
                     }
                     else if(sdk){
-                        sdk.hideLoading()
+                        typeof uni !== "undefined" ? uni.hideLoading() : wx.hideLoading()
                     }
                 }
 			}
@@ -194,7 +194,8 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
             loading(loadingText || '');
         }
         else if(sdk){
-            sdk.showLoading({title: loadingText ,icon: "none"})
+            typeof uni !== "undefined" ? uni.showLoading({title: loadingText ,icon: "none"}) : wx.showLoading({title: loadingText || "",icon: "none"})
+
         }
 	}
 
@@ -350,7 +351,7 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
                         closeLoading();
                     }
                     else if(sdk){
-                        sdk.hideLoading()
+                        typeof uni !== "undefined" ? uni.hideLoading() : wx.hideLoading()
                     }
                 }
 			}

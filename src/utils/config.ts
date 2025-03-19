@@ -409,6 +409,8 @@ export function interceptor(type: InterceptorTypeEnum, data: any) {
 export const win: Window = "undefined" != typeof window ? window : "undefined" != globalThis ? globalThis : "undefined" != self ? self : null; // window | self | globalThis
 /**
  * 获取调用该方法的环境sdk
+ * 部分特殊系统级api封装； 仅支持 uniapp wx
+ * 使用 getSdk请关闭uniapp的摇树； 这里仅用来判断是否存在sdk
  * @example `
  *  import { getSdk } from "ipink-util"
  *  // uniapp
@@ -419,5 +421,5 @@ export const win: Window = "undefined" != typeof window ? window : "undefined" !
  */
 export const getSdk = (): Uni => {
     // @ts-ignore
-    return "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : "undefined" != typeof my ? my : "undefined" != typeof qq ? qq : "undefined" != typeof swan ? swan : null; // uni | wx | qq | my
+    return "undefined" != typeof uni && uni?.getStorageSync ? uni : "undefined" != typeof wx && wx?.getStorageSync ? wx : null; // uni | wx | null
 }

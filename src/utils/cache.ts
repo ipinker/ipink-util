@@ -62,8 +62,11 @@ export class Cache implements IStorage {
 			}
 			let sdk = getSdk();
             // @ts-ignore
-			sdk ?
-				sdk!.setStorageSync(key, JSON.stringify(cacheValue)) :
+			sdk ? (
+					typeof uni !== "undefined" ? uni.setStorageSync(key, JSON.stringify(cacheValue)) :
+						wx.setStorageSync(key, JSON.stringify(cacheValue))
+				)
+				 :
 				win ?
 					win!.localStorage.setItem(key, JSON.stringify(cacheValue)) :
 					new Error("uni or window is not undefined !")
@@ -83,7 +86,7 @@ export class Cache implements IStorage {
 		try{
     		let sdk = getSdk();
 			key = this.genKey(key);
-            let cacheValue: CacheValue = sdk ? (sdk.getStorageSync(key) || {}) as CacheValue :
+            let cacheValue: CacheValue = sdk ? ((typeof uni !== "undefined" ? uni.getStorageSync(key) : wx.getStorageSync(key)) || {}) as CacheValue :
 				win ? (win.localStorage.getItem(key) || {}) as CacheValue :
 					new Error("uni or window is not undefined !") as CacheValue
 
@@ -123,8 +126,9 @@ export class Cache implements IStorage {
 		try{
 			key = this.genKey(key);
             // @ts-ignore
-            if(isUni) uni.removeStorageSync (key);
-            else window.localStorage.removeItem(key);
+            if(typeof uni !== "undefined") uni.removeStorageSync (key);
+            else if(typeof wx !== "undefined") wx.removeStorageSync (key);
+            else typeof window !== "undefined" && window.localStorage && window.localStorage.removeItem(key);
             return true;
 		}catch(e){
 			console.log("Cache.remove.error: " , e);
@@ -139,8 +143,9 @@ export class Cache implements IStorage {
 	clear() {
 		try{
             // @ts-ignore
-            if (isUni) uni.clearStorageSync()
-            else window.localStorage.clear();
+            if (typeof uni !== "undefined") uni.clearStorageSync()
+            else if (typeof wx !== "undefined") wx.clearStorageSync()
+            else typeof window !== "undefined" && window.localStorage && window.localStorage.clear();
             return true;
 		}catch(e){
 			console.log("Cache.clear.error: " + e);

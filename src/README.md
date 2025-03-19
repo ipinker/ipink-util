@@ -228,9 +228,13 @@ export function interceptor(type: string, data: any) {
     return data;
 }
 
+/**
+ * 部分特殊系统级api封装； 仅支持 uniapp wx
+ * 使用 getSdk请关闭摇树； 这里仅用来判断是否存在sdk
+ */
 export const getSdk = (): Uni => {
     // @ts-ignore
-    return "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : "undefined" != typeof my ? my : "undefined" != typeof qq ? qq : "undefined" != typeof swan ? swan : null; // uni | wx | qq | my
+    return "undefined" != typeof uni ? uni : "undefined" != typeof wx ? wx : null; // uni | wx | null
 }
 // @ts-ignore
 export const win: Window = "undefined" != typeof window ? window : "undefined" != this ? this : "undefined" != self ? self : null; // window | self | this

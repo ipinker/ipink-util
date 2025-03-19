@@ -454,14 +454,13 @@ export const isAndroid = (): boolean => {
 	return false;
 };
 
-//是否为小程序环境  h5 | uniapp
+//是否为小程序环境  h5 | uniapp | wx
 export const isMini = (): boolean => {
 	// #ifdef H5
 	if ( navigator && navigator.userAgent && navigator.userAgent.toLowerCase().indexOf("Mini") > -1) return true;
 	// #endif
-	let sdk = getSdk();
 	try{
-		const SystemInfo = sdk && sdk.getSystemInfoSync && sdk.getSystemInfoSync();
+		const SystemInfo = (typeof uni !== "undefined" ? uni.getSystemInfoSync() : wx.getSystemInfoSync()) as any;
 		// 非 H5 ｜ uniapp 平台不支持判断
 		if(SystemInfo && SystemInfo.uniPlatform && SystemInfo.uniPlatform.startsWith("mp")) return true
 	}catch(e){
@@ -482,8 +481,7 @@ export const isWxMini = (): boolean => {
 	if ( typeof window !== "undefined") return getEnv() == ENV_TYPE.WXMINI
 	// #endif
 	try{
-		let sdk = getSdk();
-		const SystemInfo = sdk && sdk.getSystemInfoSync && sdk.getSystemInfoSync();
+		const SystemInfo = (typeof uni !== "undefined" ? wx.getSystemInfoSync() : wx.getSystemInfoSync()) as any;
 		// @ts-ignore
 		if(SystemInfo?.host?.env){
 			// @ts-ignore

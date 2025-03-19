@@ -33,7 +33,6 @@ export const htmlToast = (content: string, duration = 3000, complete?: Function,
 		// 将 keyframes样式写入style内
 		style.innerHTML = toastStyle;
 		var toastBox = document.querySelector("div.toast-box");
-    	let sdk = getSdk();
 		if (!toastBox) {
 			var toast_container = document.createElement("div"); //父节点
 			toast_container.className = "toast_container"; //classname
@@ -54,18 +53,21 @@ export const htmlToast = (content: string, duration = 3000, complete?: Function,
 				complete && complete();
 				success && success();
 			}, duration);
-			sdk?.addInterceptor && sdk.addInterceptor('navigateTo', {
-				success(e) {
-					clearTimeout(timeId);
-					removeChild();
-				}
-			})
-			sdk?.addInterceptor && sdk.addInterceptor('navigateBack', {
-				success(e) {
-					clearTimeout(timeId);
-					removeChild();
-				}
-			})
+			if(typeof uni !== "undefined"){
+
+				uni.addInterceptor('navigateTo', {
+					success(e: any) {
+						clearTimeout(timeId);
+						removeChild();
+					}
+				})
+				uni.addInterceptor('navigateBack', {
+					success(e: any) {
+						clearTimeout(timeId);
+						removeChild();
+					}
+				})
+			}
 
 
 		}
@@ -134,7 +136,7 @@ export const toast = (options: IToast | string) => {
 		return htmlToast(title, duration, complete, mask, success, fail);
 	}
 	let sdk = getSdk();
-	if(sdk) sdk.showToast({
+	let params = {
 		title,
 		icon,
 		mask,
@@ -143,7 +145,10 @@ export const toast = (options: IToast | string) => {
 		fail,
 		...args,
 		complete
-	} as ShowToastOption)
+	} as ShowToastOption
+	if(sdk) {
+		typeof uni !== "undefined" ? uni.showToast(params) : wx.showToast(params)
+	}
 	else {
 		let errMsg = {
 			errMsg: "不支持【document】对象！"
@@ -158,7 +163,8 @@ export const showModal = (options: ShowModalOptions): Promise<boolean> => {
 
     	let sdk = getSdk();
 		if(sdk){
-			uni.showModal({
+			const modal = typeof uni !== "undefined" ? uni.showModal : wx.showModal;
+			modal({
 				... (options || {}),
 				success: (e: any) => {
 					options?.success && options.success(e)

@@ -213,18 +213,21 @@ export const navigateToMiniProgram = async (params: JumpAppOption) => {
 
 function wxNavigateToMiniProgram (appId: string, path: string, extraData?: AnyObject, success?: Function, fail?: Function, version = "release") {
     let sdk = getSdk();
-	sdk && sdk.navigateToMiniProgram({
+    let params = {
 		appId: appId,
 		path: path,
 		extraData: extraData,
 		version,
-		success(res) {
+		success(res: any) {
 			success && success(res)
 		},
-		fail(res) {
+		fail(res: any) {
 			fail && fail()
 		}
-	})
+	}
+	if(sdk){
+        typeof uni !== "undefined" ? uni.navigateToMiniProgram(params) : wx.navigateToMiniProgram(params)
+    }
 }
 
 
