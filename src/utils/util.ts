@@ -544,7 +544,7 @@ export const setTitleName = (title = "") => {
  * @param begin 从第几位开始
  * @param end   倒数从第几位结束
  */
-const desensitization = (str: string, begin = 3, end = begin) => {
+export const desensitization = (str: string, begin = 3, end = begin) => {
 	if (!str || str.length <= begin + end) return str;
     end = str.length - end
 	let firstStr = str.slice(0, begin);

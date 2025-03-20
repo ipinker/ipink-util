@@ -315,7 +315,7 @@ export const addNextUrl = (url: string, options?: AddNextUrlOption) => {
 	let callbackUrl = "";
 	callbackUrl = getPageUrl();
 	if(options.delParamArr){
-		callbackUrl = deleteQuery(callbackUrl, options.delParamArr)
+		callbackUrl = encodeURIComponent(deleteQuery(callbackUrl, options.delParamArr))
 	}
 	let key = options.key || "nextUrl"
 	if (url.indexOf(key) == -1) {

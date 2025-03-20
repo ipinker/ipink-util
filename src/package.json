@@ -1,6 +1,6 @@
 {
 	"name": "ipink-util",
-	"version": "1.4.6",
+	"version": "1.5.1",
 	"description": "util.js",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
@@ -43,7 +43,7 @@
 	"dependencies": {
 		"@ctrl/tinycolor": "^4.0.2",
 		"@dcloudio/types": "^3.4.8",
-		"ipink-themejs": "^1.0.2",
+		"ipink-themejs": "^1.0.0",
 		"lodash-es": "^4.17.21"
 	},
 	"license": "ISC"
