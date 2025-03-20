@@ -77,9 +77,7 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
 			url: reqUrl,
 			filePath: file,
 			name: key,
-			// #ifdef MP-ALIPAY
 			fileType: fileType,
-			// #endif
 			formData: formData,
 			timeout: HttpConfig.timeout,
 			header: {
@@ -265,7 +263,6 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
             })
             return ;
         }
-		// #ifndef MP-WEIXIN
 		let fileList = (files || []).map((item: string, index: number) => {
 			return {
 				name: index,
@@ -276,9 +273,7 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
 		let _options = {
 			url: reqUrl, //仅为示例，非真实的接口地址
 			files: fileList,
-			// #ifdef MP-ALIPAY
 			fileType: fileType,
-			// #endif
 			formData: formData,
 			header: {
 				... header
@@ -358,7 +353,6 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
 		});
 		interceptor("ExecUpload", uploadTask )
 
-		// #endif
 	});
 }
 

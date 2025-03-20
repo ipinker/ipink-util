@@ -72,6 +72,7 @@ export default ({mode}: ConfigEnv): UserConfigExport => {
             },
         },
         plugins: [
+
             dts({
                 entryRoot: "./",
                 outDir: dir
