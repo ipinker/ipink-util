@@ -1235,14 +1235,18 @@ export function buildHierarchyArray <T extends { id: string | number }>(arr: T[]
 
 	// 遍历数组，构建树形结构
 	arr.forEach((item: T) => {
-		let pid = item[key] as FormatTArray<T>;
-		if (pid === null || pid === undefined) {
+		let pid = item[key] as string;
+		if (!pid) {
 			// 如果没有 pid，说明是根节点，直接放入结果数组
 			result.push(map[item.id]);
 		} else {
-			// 否则，将当前元素添加到其父元素的 children 数组中
-			if (pid) {
-				pid.children.push(map[item.id]);
+			if (!pid) {
+				// 如果没有 pid，说明是根节点，直接放入结果数组
+				result.push(map[item.id]);
+			} else {
+
+				map[pid].children.push(map[item.id]);
+
 			}
 		}
 	});

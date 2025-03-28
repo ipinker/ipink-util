@@ -35,6 +35,7 @@ export function genRequestUrl(url: string, path = "", prefix = "") {
 }
 
 export declare interface IRequestConfigOption {
+    timeout?: number,
     /**
      * 请求的api部分
      */
@@ -221,6 +222,7 @@ export const request = <T = unknown>(
         toast = HttpConfig.toast,
 		header,
 		prefix, // 前缀
+        timeout = HttpConfig.timeout
 	} = config;
 	const reqUrl = genRequestUrl(url || HttpConfig.base_url, api, prefix)
     let sdk = getSdk();
@@ -236,7 +238,7 @@ export const request = <T = unknown>(
         let _options = {
             url: reqUrl,
 			method: method || HttpConfig.default_method,
-			timeout: HttpConfig.timeout,
+			timeout,
 			data,
 			header: {
 				"content-type": HttpConfig.content_type,
