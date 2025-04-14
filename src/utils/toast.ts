@@ -132,7 +132,7 @@ export const toast = (options: IToast | string) => {
 	}
 	if(!title) return "";
 	// @ts-ignore
-	if(Config.use_inner_toast && typeof document !== "undefined" && document.createElement) {
+	if(Config.use_inner_toast && typeof document !== "undefined" && document.createElement && document.removeEventListener) {
 		return htmlToast(title, duration, complete, mask, success, fail);
 	}
 	let sdk = getSdk();
