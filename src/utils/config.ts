@@ -79,6 +79,7 @@ export class Config {
     }
 }
 
+
 declare interface IHttpConfig {
     /**
      * 请求的URL
@@ -423,3 +424,5 @@ export const getSdk = (): Uni => {
     // @ts-ignore
     return "undefined" != typeof uni && uni?.getStorageSync ? uni : "undefined" != typeof wx && wx?.getStorageSync ? wx : null; // uni | wx | null
 }
+
+export const ConfigBase = Config

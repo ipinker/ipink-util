@@ -46,7 +46,7 @@ export default ({mode}: ConfigEnv): UserConfigExport => {
                         //打包后文件名
                         entryFileNames: "[name].mjs",
                         //让打包目录和我们目录对应
-                        preserveModules: false,
+                        preserveModules: true,
                         preserveModulesRoot: "./",
                         exports: "named",
                         //配置打包根目录
@@ -58,7 +58,7 @@ export default ({mode}: ConfigEnv): UserConfigExport => {
                         //打包后文件名
                         entryFileNames: "[name].js",
                         //让打包目录和我们目录对应
-                        preserveModules: false,
+                        preserveModules: true,
                         preserveModulesRoot: "./",
                         exports: "named",
                         //配置打包根目录
