@@ -20,3 +20,4 @@ export * from "./utils/jsonp";
 export * from "./utils/axios";
 export * from "./utils/request";
 export * from "./utils/upload";
+export * from "./utils/sse";
