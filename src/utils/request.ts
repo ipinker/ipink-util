@@ -200,8 +200,11 @@ export const request = <T = unknown>(
 	if(typeof baseConfig === "string") baseConfig = {
 		api: baseConfig as string
 	}
-	if(typeof baseConfig === "object" && baseConfig.data && !data)  {
-		data = baseConfig.data;
+	if(typeof baseConfig === "object" && baseConfig.data)  {
+		data = {
+            ... baseConfig.data,
+            ... (data || {})
+        };
 	}
 	let config = {
 		... baseConfig,
@@ -250,8 +253,7 @@ export const request = <T = unknown>(
 		const request = {
             ... _options,
 			success: (res: IBaseResponse<IResponse<unknown>>) => {
-				let data: IResponse<unknown> = res.data || {};
-                data = interceptor("AfterRequest",data )
+                res.data = interceptor("AfterRequest",data || {} )
 				let ok = false;
                 let errMsg = ""
 				if(res.statusCode === 200){
