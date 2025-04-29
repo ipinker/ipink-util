@@ -76,9 +76,9 @@ export function stringifyQuery(obj : QueryType): string {
 						if (val2 === undefined) return
 
 						if (val2 === null) result.push(encode(key))
-
-						// 去除编码 防止多次编码
-						// result.push(encode(key) + '=' + encode(val2))
+						else if(typeof val2 === "object"){
+							result.push(encode(key) + '=' + JSON.stringify(val2))
+						}
 						else result.push(encode(key) + '=' + val2)
 
 					})
