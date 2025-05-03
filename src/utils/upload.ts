@@ -63,6 +63,12 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
 	} = options || {};
 	const reqUrl = genRequestUrl(HttpConfig.base_url, api, prefix)
 
+    if(typeof showToast == "undefined"){
+        showToast = HttpConfig.show_toast
+    }
+    if(typeof showToast == "undefined"){
+        showLoading = HttpConfig.show_loading
+    }
     let sdk = getSdk();
 	if (showLoading) {
         if(typeof loading == "function") {
@@ -186,6 +192,12 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
         toast = HttpConfig.toast,
 	} = params || {};
 
+    if(typeof showToast == "undefined"){
+        showToast = HttpConfig.show_toast
+    }
+    if(typeof showToast == "undefined"){
+        showLoading = HttpConfig.show_loading
+    }
     let sdk = getSdk();
 	if (showLoading) {
         if(typeof loading == "function") {

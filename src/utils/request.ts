@@ -213,7 +213,7 @@ export const request = <T = unknown>(
 	let {
 		api,
 		url,
-		method,
+		method = HttpConfig.default_method,
 		isLoading,
 		showLoading = isLoading,
         closeLoading = HttpConfig.closeLoading,
@@ -224,9 +224,15 @@ export const request = <T = unknown>(
 		toastText ,
         toast = HttpConfig.toast,
 		header,
-		prefix, // 前缀
+		prefix =  HttpConfig.api_prefix, // 前缀
         timeout = HttpConfig.timeout
 	} = config;
+    if(typeof showToast == "undefined"){
+        showToast = HttpConfig.show_toast
+    }
+    if(typeof showToast == "undefined"){
+        showLoading = HttpConfig.show_loading
+    }
 	const reqUrl = genRequestUrl(url || HttpConfig.base_url, api, prefix)
     let sdk = getSdk();
 	if (showLoading) {
