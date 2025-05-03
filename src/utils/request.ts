@@ -259,7 +259,7 @@ export const request = <T = unknown>(
 		const request = {
             ... _options,
 			success: (res: IBaseResponse<IResponse<unknown>>) => {
-                res.data = interceptor("AfterRequest",data || {} )
+                res.data = interceptor("AfterRequest",res.data || {} )
 				let ok = false;
                 let errMsg = ""
 				if(res.statusCode === 200){
