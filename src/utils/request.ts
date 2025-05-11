@@ -230,7 +230,7 @@ export const request = <T = unknown>(
     if(typeof showToast == "undefined"){
         showToast = HttpConfig.show_toast
     }
-    if(typeof showToast == "undefined"){
+    if(typeof showLoading == "undefined"){
         showLoading = HttpConfig.show_loading
     }
 	const reqUrl = genRequestUrl(url || HttpConfig.base_url, api, prefix)

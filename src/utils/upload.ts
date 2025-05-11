@@ -66,7 +66,7 @@ export const uploadFile = (options: IUploadConfigOption): Promise<IUploadRespons
     if(typeof showToast == "undefined"){
         showToast = HttpConfig.show_toast
     }
-    if(typeof showToast == "undefined"){
+    if(typeof showLoading == "undefined"){
         showLoading = HttpConfig.show_loading
     }
     let sdk = getSdk();
@@ -195,7 +195,7 @@ export const uploadMoreFile = (params: IUploadConfigOption): Promise<IUploadMore
     if(typeof showToast == "undefined"){
         showToast = HttpConfig.show_toast
     }
-    if(typeof showToast == "undefined"){
+    if(typeof showLoading == "undefined"){
         showLoading = HttpConfig.show_loading
     }
     let sdk = getSdk();
