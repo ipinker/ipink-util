@@ -415,7 +415,7 @@ export const upload = async function (options: IUploadExtConfigOption, choosedCa
         loading,
 		loadingText,
         isToast ,
-		showToast,
+		showToast = isToast,
 		toastText ,
         toast,
         prefix,
@@ -438,7 +438,8 @@ export const upload = async function (options: IUploadExtConfigOption, choosedCa
 			count,
 			sourceType,
 			extension,
-			type: "all"
+			type: "all",
+            showToast
 		})
 	}
 	else if(type == "video"){
@@ -446,7 +447,8 @@ export const upload = async function (options: IUploadExtConfigOption, choosedCa
 			sourceType,
 			maxDuration,
 			camera,
-			compressed
+			compressed,
+            showToast
 		});
 	}
 	else {
@@ -454,7 +456,8 @@ export const upload = async function (options: IUploadExtConfigOption, choosedCa
 			count,
 			sourceType,
 			fileType,
-			extension
+			extension,
+            showToast
 		});
 	}
     list = interceptor("AfterChooseFile",list )

@@ -82,7 +82,8 @@ export type ChooseImageOption = {
     /** @desc 固定不变 **/
     fileType?: "image" | "video" | "audio",
     /** @desc 文件后缀限制 **/
-    extension?: string[]
+    extension?: string[],
+	showToast?: boolean
 }
 export type ChooseImageAlipayResult = {
     /** @desc 图片文件路径 **/
@@ -111,7 +112,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
 		sourceType = 1,
 		fileType= "image",
 		extension,
-
+		showToast = false
 	} = params || {};
 	return new Promise(async (resolve) => {
 		extension = extension || ["png", "PNG", "JPG", "jpg", "jpeg"];
@@ -177,7 +178,7 @@ export function chooseImage (params: ChooseImageOption ): Promise<string[]> {
 					resolve(apFilePath);
 				},
 				fail(err) {
-					toast(err && err.errMsg || '上传失败!');
+					if(showToast) toast(err && err.errMsg || '上传失败!');
 					resolve([]);
 				}
 			});
@@ -498,9 +499,10 @@ export function base64ToPath(base64: string): Promise<string | ErrorType> {
 
 type ChooseVideoOptions = {
     sourceType: 1 | 2 | 3
-    maxDuration: any
-    camera: any
-    compressed: boolean
+    maxDuration?: any
+    camera?: any
+    compressed?: boolean,
+	showToast?: boolean
 }
 /**
  * @desc 选择视频
@@ -508,7 +510,7 @@ type ChooseVideoOptions = {
  * @return: { Promise<string[]> }
  */
 export function chooseVideo(options?: ChooseVideoOptions): Promise<string[]> {
-    let {sourceType = 1, maxDuration, camera, compressed} = options || {};
+    let {sourceType = 1, maxDuration, camera, compressed, showToast = false} = options || {};
     if(!uni || !uni.chooseVideo) return Promise.resolve([])
 	return new Promise((resolve) => {
 		uni.chooseVideo({
@@ -521,7 +523,7 @@ export function chooseVideo(options?: ChooseVideoOptions): Promise<string[]> {
 			},
 			fail(err) {
 				resolve([])
-				toast(err && err.errMsg || '上传失败!');
+				if(showToast) toast(err && err.errMsg || '上传失败!');
 			}
 		});
 	})
@@ -530,7 +532,8 @@ type ChooseFileOptions = {
     count?: number
     extension?: string[]
     type?: any,
-    sourceType?: 1 | 2 | 3
+    sourceType?: 1 | 2 | 3,
+	showToast?: boolean
 }
 /**
  * @desc 选择视频
@@ -538,7 +541,7 @@ type ChooseFileOptions = {
  * @return:
  */
 export function chooseOtherFile(options?: ChooseFileOptions): Promise<string[]> {
-    let { count = 1, extension, type = "all", sourceType } = options || {};
+    let { count = 1, extension, type = "all", sourceType, showToast = false } = options || {};
 	extension = extension || ['.csv', '.xlsx']
 	return new Promise((resolve) => {
 		const params = {
@@ -547,7 +550,7 @@ export function chooseOtherFile(options?: ChooseFileOptions): Promise<string[]> 
 			sourceType: sourceType == 2 ? ["album"] : sourceType == 3 ? ["camera"] : ["album", "camera"],
 			extension: extension,
 			fail: (err: ErrorType) => {
-				toast(err && err.errMsg || "上传失败!")
+				if(showToast) toast(err && err.errMsg || "上传失败!")
 				resolve([])
 			}
 		}
