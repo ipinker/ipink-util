@@ -240,7 +240,7 @@ export const request = <T = unknown>(
             loading(loadingText || '');
         }
         else if(sdk){
-            typeof uni !== "undefined" ? uni.showLoading({title: loadingText ,icon: "none"}) : wx.showLoading({title: loadingText || "" ,icon: "none"})
+            typeof uni !== "undefined" ? uni.showLoading({title: loadingText || "" ,icon: "none"}) : wx.showLoading({title: loadingText || "" ,icon: "none"})
         }
 	}
 	return new Promise((reslove) => {
@@ -285,6 +285,15 @@ export const request = <T = unknown>(
 					errMsg = "您的访问出现了一点问题，请稍后再做尝试！"
                     interceptor("" + res.statusCode as InterceptorTypeEnum,res )
 				}
+
+                if(showLoading){
+                    if(typeof closeLoading == "function") {
+                        closeLoading();
+                    }
+                    else if(sdk){
+                        typeof uni !== "undefined" ? uni.hideLoading() : wx.hideLoading()
+                    }
+                }
                 if(showToast){
                     if(typeof toast === "function") {
                         toast(errMsg);
@@ -299,6 +308,15 @@ export const request = <T = unknown>(
 				} as IfUnknown<T, IResponse<unknown>>);
 			},
 			fail: (err: IErrorResponse) => {
+
+                if(showLoading){
+                    if(typeof closeLoading == "function") {
+                        closeLoading();
+                    }
+                    else if(sdk){
+                        typeof uni !== "undefined" ? uni.hideLoading() : wx.hideLoading()
+                    }
+                }
 				let errMsg = err && err.errMsg || toastText;
                 if(showToast && errMsg){
                     if(typeof toast === "function") {
@@ -314,14 +332,6 @@ export const request = <T = unknown>(
 				} as IfUnknown<T, IResponse<unknown>>);
 			},
 			complete: () => {
-                if(showLoading){
-                    if(typeof closeLoading == "function") {
-                        closeLoading();
-                    }
-                    else if(sdk){
-                        typeof uni !== "undefined" ? uni.hideLoading() : wx.hideLoading()
-                    }
-                }
 			}
 		}
 		const requestTask = typeof uni !== "undefined" ? uni.request(request as unknown as UniApp. RequestOptions) : wx.request(request as unknown as  WechatMiniprogram.RequestOption);

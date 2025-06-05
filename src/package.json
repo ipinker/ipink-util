@@ -1,6 +1,6 @@
 {
 	"name": "ipink-util",
-	"version": "1.6.3",
+	"version": "1.6.5",
 	"description": "util.js",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
